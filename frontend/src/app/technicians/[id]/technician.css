@@ -1,0 +1,52 @@
+.tech-profile-page { padding: 40px 0; }
+.tech-profile-layout { display: grid; grid-template-columns: 1fr 340px; gap: 28px; align-items: start; }
+.tech-profile-main { display: flex; flex-direction: column; gap: 24px; }
+.tech-profile-header { display: flex; gap: 24px; align-items: flex-start; }
+.tech-profile-avatar { width: 100px; height: 100px; border-radius: 50%; overflow: hidden; background: var(--bg-surface-2); display: flex; align-items: center; justify-content: center; border: 3px solid var(--border); flex-shrink: 0; }
+.tech-profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.tech-avatar-fallback-lg { font-size: 2.2rem; font-weight: 700; color: var(--accent); }
+.tech-profile-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.tech-profile-name { font-size: 1.6rem; font-weight: 800; }
+.verified-badge-lg { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: var(--radius-full); background: rgba(16, 185, 129, 0.15); color: var(--success); font-size: 0.78rem; font-weight: 600; }
+.tech-profile-location { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; }
+.tech-profile-rating { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 16px; }
+.tech-profile-stats { display: flex; gap: 24px; }
+.profile-stat { text-align: center; }
+.profile-stat-value { display: block; font-size: 1.3rem; font-weight: 800; color: var(--accent); }
+.profile-stat-label { font-size: 0.78rem; color: var(--text-muted); }
+.tech-profile-section { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+.section-label { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+.tech-profile-bio { color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem; }
+.tech-profile-services { display: flex; flex-direction: column; gap: 12px; }
+.profile-service-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-surface-2); border-radius: var(--radius); }
+.profile-service-icon { font-size: 1.5rem; }
+.profile-service-name { display: block; font-weight: 600; font-size: 0.9rem; }
+.profile-service-price { font-size: 0.82rem; color: var(--accent); }
+
+/* Reviews */
+.reviews-list { display: flex; flex-direction: column; gap: 16px; }
+.review-item { padding: 16px; background: var(--bg-surface-2); border-radius: var(--radius); }
+.review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.review-author { display: flex; align-items: center; gap: 10px; }
+.review-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.85rem; }
+.review-name { display: block; font-weight: 600; font-size: 0.9rem; }
+.review-date { font-size: 0.78rem; color: var(--text-muted); }
+.review-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+.no-reviews { color: var(--text-muted); text-align: center; padding: 24px; }
+
+/* Sidebar */
+.sidebar-card { position: sticky; top: 96px; text-align: center; }
+.sidebar-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.sidebar-desc { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 20px; }
+.available-badge, .unavailable-badge { display: block; margin-top: 16px; font-size: 0.85rem; }
+.available-badge { color: var(--success); }
+.unavailable-badge { color: var(--danger); }
+
+.tech-profile-skeleton { display: flex; flex-direction: column; align-items: center; padding: 60px 0; }
+
+@media (max-width: 768px) {
+  .tech-profile-layout { grid-template-columns: 1fr; }
+  .tech-profile-header { flex-direction: column; align-items: center; text-align: center; }
+  .tech-profile-stats { justify-content: center; }
+  .sidebar-card { position: static; }
+}

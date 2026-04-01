@@ -1,0 +1,133 @@
+.auth-page {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 107, 53, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(30, 58, 95, 0.1) 0%, transparent 50%);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 460px;
+}
+
+.auth-card {
+  padding: 40px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.auth-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.auth-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  color: var(--danger);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-footer-text {
+  text-align: center;
+  margin-top: 24px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.auth-link {
+  color: var(--accent);
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.auth-link:hover {
+  color: var(--accent-light);
+}
+
+/* Role selector */
+.role-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.role-option {
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--bg-surface-2);
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+}
+
+.role-option:hover {
+  border-color: var(--text-muted);
+}
+
+.role-option.selected {
+  border-color: var(--accent);
+  background: rgba(255, 107, 53, 0.08);
+}
+
+.role-option-icon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.role-option-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.role-option-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
