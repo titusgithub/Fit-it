@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, Send, Phone, MoreVertical, Check, CheckCheck } from 'lucide-react-native';
 import io from 'socket.io-client';
-import io from 'socket.io-client';
 import api, { SOCKET_URL } from '../services/api';
 
 export default function ChatScreen({ route, navigation }) {
