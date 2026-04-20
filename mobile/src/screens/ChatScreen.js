@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Send, Phone, MoreVertical, Check, CheckCheck } from 'lucide-react-native';
+import { ArrowLeft, Send, Phone, CheckCheck } from 'lucide-react-native';
 import io from 'socket.io-client';
 import api, { SOCKET_URL } from '../services/api';
 
@@ -18,10 +18,8 @@ export default function ChatScreen({ route, navigation }) {
   const flatListRef = useRef();
 
   useEffect(() => {
-    // Fetch initial messages
     fetchMessages();
 
-    // Setup socket
     socketRef.current = io(SOCKET_URL);
     
     socketRef.current.emit('join', user.id);
@@ -84,24 +82,40 @@ export default function ChatScreen({ route, navigation }) {
   const renderMessage = ({ item }) => {
     const isMe = item.sender_id === user.id;
     return (
-      <View className={`mb-4 flex-row ${isMe ? 'justify-end' : 'justify-start'}`}>
+      <View style={{
+        marginBottom: 14,
+        flexDirection: 'row',
+        justifyContent: isMe ? 'flex-end' : 'flex-start',
+      }}>
         {!isMe && (
           <Image 
-            source={{ uri: receiverAvatar || `https://ui-avatars.com/api/?name=${receiverName}&background=cbd5e1&color=fff` }} 
-            className="w-8 h-8 rounded-full self-end mr-2"
+            source={{ uri: receiverAvatar || `https://ui-avatars.com/api/?name=${receiverName}&background=1e3a5f&color=f1f5f9` }} 
+            style={{ width: 30, height: 30, borderRadius: 15, alignSelf: 'flex-end', marginRight: 8 }}
           />
         )}
-        <View 
-          className={`max-w-[75%] px-4 py-3 rounded-2xl ${isMe ? 'bg-primary rounded-tr-none' : 'bg-slate-100 rounded-tl-none'}`}
-        >
-          <Text className={`${isMe ? 'text-white' : 'text-text-primary'} text-base font-medium`}>
+        <View style={{
+          maxWidth: '75%',
+          paddingHorizontal: 16, paddingVertical: 12,
+          borderRadius: 16,
+          backgroundColor: isMe ? '#ff6b35' : '#1a2332',
+          borderTopRightRadius: isMe ? 4 : 16,
+          borderTopLeftRadius: isMe ? 16 : 4,
+        }}>
+          <Text style={{
+            color: isMe ? '#fff' : '#f1f5f9',
+            fontSize: 15, fontWeight: '500',
+          }}>
             {item.content}
           </Text>
-          <View className="flex-row items-center justify-end mt-1">
-            <Text className={`text-[10px] ${isMe ? 'text-white/70' : 'text-text-muted'} mr-1`}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 4 }}>
+            <Text style={{
+              fontSize: 10,
+              color: isMe ? 'rgba(255,255,255,0.6)' : '#64748b',
+              marginRight: 4,
+            }}>
               {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </Text>
-            {isMe && <CheckCheck size={12} color="rgba(255,255,255,0.7)" />}
+            {isMe && <CheckCheck size={12} color="rgba(255,255,255,0.6)" />}
           </View>
         </View>
       </View>
@@ -109,55 +123,80 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   return (
-    <View className="flex-1 bg-background">
+    <View style={{ flex: 1, backgroundColor: '#0a0f1a' }}>
       {/* Header */}
-      <View className="px-6 pt-16 pb-4 bg-white/90 border-b border-slate-100 flex-row items-center justify-between shadow-sm z-10 w-full" style={{ position: 'absolute', top: 0 }}>
-        <View className="flex-row items-center">
-          <TouchableOpacity onPress={() => navigation.goBack()} className="mr-3 p-2 bg-slate-50 rounded-full border border-slate-100">
-            <ArrowLeft size={20} color="#475569" />
+      <View style={{
+        paddingHorizontal: 24, paddingTop: 56, paddingBottom: 14,
+        backgroundColor: '#111827',
+        borderBottomWidth: 1, borderBottomColor: 'rgba(148,163,184,0.1)',
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{
+              marginRight: 14, padding: 8,
+              backgroundColor: '#1a2332', borderRadius: 99,
+              borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
+            }}
+          >
+            <ArrowLeft size={20} color="#94a3b8" />
           </TouchableOpacity>
-          <View className="flex-row items-center">
-            <Image 
-              source={{ uri: receiverAvatar || `https://ui-avatars.com/api/?name=${receiverName}&background=4f46e5&color=fff` }} 
-              className="w-11 h-11 rounded-full border-2 border-slate-50"
-            />
-            <View className="ml-3">
-              <Text className="text-slate-800 text-base font-bold">{receiverName}</Text>
-              <Text className="text-[#4f46e5] font-medium text-xs font-medium">{isTyping ? 'typing...' : 'Active now'}</Text>
-            </View>
+          <Image 
+            source={{ uri: receiverAvatar || `https://ui-avatars.com/api/?name=${receiverName}&background=1e3a5f&color=f1f5f9` }} 
+            style={{
+              width: 42, height: 42, borderRadius: 21,
+              borderWidth: 2, borderColor: '#1a2332',
+            }}
+          />
+          <View style={{ marginLeft: 12 }}>
+            <Text style={{ color: '#f1f5f9', fontSize: 16, fontWeight: '700' }}>{receiverName}</Text>
+            <Text style={{ color: isTyping ? '#ff6b35' : '#10b981', fontSize: 12, fontWeight: '500' }}>
+              {isTyping ? 'typing...' : 'Active now'}
+            </Text>
           </View>
         </View>
-        <View className="flex-row items-center space-x-2">
-          <TouchableOpacity className="p-2.5 bg-slate-50 rounded-full border border-slate-100">
-            <Phone size={18} color="#475569" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={{
+          padding: 10, backgroundColor: '#1a2332', borderRadius: 99,
+          borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
+        }}>
+          <Phone size={18} color="#94a3b8" />
+        </TouchableOpacity>
       </View>
 
       {/* Messages */}
       {loading ? (
-        <ActivityIndicator color="#4f46e5" size="large" className="flex-1 mt-32" />
+        <ActivityIndicator color="#ff6b35" size="large" style={{ flex: 1 }} />
       ) : (
-        <View className="flex-1 mt-[100px]">
-          <FlatList
-            ref={flatListRef}
-            data={messages}
-            renderItem={renderMessage}
-            keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
-            onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
-          />
-        </View>
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ padding: 20, paddingBottom: 10 }}
+          onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
+        />
       )}
 
       {/* Input */}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View className="px-5 py-4 bg-white border-t border-slate-100 flex-row items-center pb-8 shadow-2xl">
-          <View className="flex-1 bg-slate-50 border border-slate-200 rounded-3xl px-5 py-3.5 flex-row items-center mr-3">
+        <View style={{
+          paddingHorizontal: 20, paddingVertical: 14, paddingBottom: 32,
+          backgroundColor: '#111827',
+          borderTopWidth: 1, borderTopColor: 'rgba(148,163,184,0.1)',
+          flexDirection: 'row', alignItems: 'center',
+        }}>
+          <View style={{
+            flex: 1,
+            backgroundColor: '#1a2332',
+            borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
+            borderRadius: 24, paddingHorizontal: 18, paddingVertical: 12,
+            marginRight: 12,
+          }}>
             <TextInput
               placeholder="Message..."
-              placeholderTextColor="#cbd5e1"
-              className="flex-1 text-slate-800 text-base font-medium max-h-24"
+              placeholderTextColor="#64748b"
+              style={{ color: '#f1f5f9', fontSize: 15, maxHeight: 96 }}
               value={newMessage}
               onChangeText={handleTyping}
               multiline
@@ -166,7 +205,13 @@ export default function ChatScreen({ route, navigation }) {
           <TouchableOpacity 
             onPress={handleSend}
             activeOpacity={0.8}
-            className="w-12 h-12 bg-[#4f46e5] rounded-full items-center justify-center shadow-lg shadow-indigo-500/30"
+            style={{
+              width: 48, height: 48,
+              backgroundColor: '#ff6b35', borderRadius: 24,
+              alignItems: 'center', justifyContent: 'center',
+              shadowColor: '#ff6b35', shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3, shadowRadius: 10, elevation: 5,
+            }}
           >
             <Send size={20} color="white" style={{ marginLeft: -2 }} />
           </TouchableOpacity>

@@ -29,29 +29,59 @@ export default function LoginScreen({ navigation }) {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-background"
+      style={{ flex: 1, backgroundColor: '#0a0f1a' }}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 px-8 pt-24 pb-12">
+        <View style={{ flex: 1, paddingHorizontal: 28, paddingTop: 100, paddingBottom: 48 }}>
           {/* Logo Section */}
-          <View className="items-center mb-12">
-            <View className="w-20 h-20 bg-primary rounded-3xl items-center justify-center shadow-xl shadow-primary/30">
-              <Wrench size={40} color="white" />
+          <View style={{ alignItems: 'center', marginBottom: 48 }}>
+            <View style={{
+              width: 72, height: 72,
+              backgroundColor: 'rgba(255, 107, 53, 0.12)',
+              borderRadius: 22,
+              alignItems: 'center', justifyContent: 'center',
+              borderWidth: 1, borderColor: 'rgba(255, 107, 53, 0.25)',
+            }}>
+              <Wrench size={36} color="#ff6b35" />
             </View>
-            <Text className="text-4xl font-bold text-text-primary mt-6 tracking-tight">Fix-it</Text>
-            <Text className="text-text-secondary mt-2 text-lg">Your neighborhood technician</Text>
+            <Text style={{
+              fontSize: 32, fontWeight: '900', color: '#f1f5f9',
+              marginTop: 20, letterSpacing: -1,
+            }}>FindFix</Text>
+            <Text style={{
+              color: '#94a3b8', marginTop: 6, fontSize: 16,
+            }}>Kenya's #1 Technician Marketplace</Text>
           </View>
 
-          {/* Form Section */}
-          <View className="space-y-6">
-            <View>
-              <Text className="text-text-primary font-bold mb-2 ml-1">Email Address</Text>
-              <View className="flex-row items-center bg-white border border-slate-100 rounded-2xl px-5 py-4 shadow-sm">
-                <Mail size={20} color="#94a3b8" className="mr-3" />
+          {/* Glass Card */}
+          <View style={{
+            backgroundColor: 'rgba(255,255,255,0.04)',
+            borderRadius: 20,
+            padding: 28,
+            borderWidth: 1,
+            borderColor: 'rgba(148, 163, 184, 0.1)',
+          }}>
+            <Text style={{
+              fontSize: 22, fontWeight: '800', color: '#f1f5f9', marginBottom: 4,
+            }}>Welcome Back</Text>
+            <Text style={{
+              color: '#94a3b8', marginBottom: 28, fontSize: 14,
+            }}>Sign in to your FindFix account</Text>
+
+            {/* Email */}
+            <View style={{ marginBottom: 18 }}>
+              <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '500', marginBottom: 8 }}>Email Address</Text>
+              <View style={{
+                flexDirection: 'row', alignItems: 'center',
+                backgroundColor: '#1a2332',
+                borderWidth: 1, borderColor: 'rgba(148, 163, 184, 0.1)',
+                borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
+              }}>
+                <Mail size={18} color="#64748b" style={{ marginRight: 12 }} />
                 <TextInput
-                  placeholder="name@example.com"
-                  placeholderTextColor="#cbd5e1"
-                  className="flex-1 text-slate-800 text-base font-medium"
+                  placeholder="you@example.com"
+                  placeholderTextColor="#64748b"
+                  style={{ flex: 1, color: '#f1f5f9', fontSize: 15 }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   value={email}
@@ -60,47 +90,68 @@ export default function LoginScreen({ navigation }) {
               </View>
             </View>
 
-            <View className="mt-4">
-              <Text className="text-text-primary font-bold mb-2 ml-1">Password</Text>
-              <View className="flex-row items-center bg-white border border-slate-100 rounded-2xl px-5 py-4 shadow-sm">
-                <Lock size={20} color="#94a3b8" className="mr-3" />
+            {/* Password */}
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '500', marginBottom: 8 }}>Password</Text>
+              <View style={{
+                flexDirection: 'row', alignItems: 'center',
+                backgroundColor: '#1a2332',
+                borderWidth: 1, borderColor: 'rgba(148, 163, 184, 0.1)',
+                borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
+              }}>
+                <Lock size={18} color="#64748b" style={{ marginRight: 12 }} />
                 <TextInput
                   placeholder="••••••••"
-                  placeholderTextColor="#cbd5e1"
-                  className="flex-1 text-slate-800 text-base font-medium"
+                  placeholderTextColor="#64748b"
+                  style={{ flex: 1, color: '#f1f5f9', fontSize: 15 }}
                   secureTextEntry
                   value={password}
                   onChangeText={setPassword}
                 />
               </View>
-              <TouchableOpacity className="mt-4 self-end bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
-                <Text className="text-primary font-bold text-xs">Forgot Password?</Text>
-              </TouchableOpacity>
             </View>
 
+            {/* Sign In Button */}
             <TouchableOpacity 
               onPress={handleLogin}
               disabled={loading}
-              activeOpacity={0.8}
-              className={`bg-[#4f46e5] mt-6 py-4 rounded-2xl flex-row items-center justify-center shadow-xl shadow-indigo-500/40 ${loading ? 'opacity-70' : ''}`}
+              activeOpacity={0.85}
+              style={{
+                marginTop: 24,
+                paddingVertical: 16,
+                borderRadius: 14,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#ff6b35',
+                shadowColor: '#ff6b35',
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.35,
+                shadowRadius: 16,
+                elevation: 8,
+                opacity: loading ? 0.7 : 1,
+              }}
             >
               {loading ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <>
-                  <Text className="text-white text-lg font-extrabold tracking-wide mr-2">Sign In to Fix-it</Text>
-                  <ArrowRight size={22} color="white" />
+                  <Text style={{
+                    color: '#fff', fontSize: 17, fontWeight: '800',
+                    letterSpacing: 0.3, marginRight: 6,
+                  }}>Sign In</Text>
+                  <ArrowRight size={20} color="white" />
                 </>
               )}
             </TouchableOpacity>
           </View>
 
           {/* Footer */}
-          <View className="mt-auto items-center">
-            <View className="flex-row items-center">
-              <Text className="text-text-secondary text-base">Don't have an account? </Text>
+          <View style={{ marginTop: 'auto', alignItems: 'center', paddingTop: 32 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ color: '#94a3b8', fontSize: 15 }}>Don't have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                <Text className="text-primary font-bold text-base">Sign Up</Text>
+                <Text style={{ color: '#ff6b35', fontWeight: '700', fontSize: 15 }}>Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>

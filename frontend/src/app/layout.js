@@ -11,8 +11,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <AuthProvider>
           <Navbar />
           <main style={{ paddingTop: '72px', minHeight: 'calc(100vh - 72px)' }}>
