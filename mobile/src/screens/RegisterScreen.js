@@ -34,45 +34,35 @@ export default function RegisterScreen({ navigation }) {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1, backgroundColor: '#0a0f1a' }}
+      className="flex-1 bg-background"
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1, paddingHorizontal: 28, paddingTop: 56, paddingBottom: 48 }}>
+        <View className="flex-1 px-7 pt-14 pb-12">
           {/* Back Button */}
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{
-              marginBottom: 24, width: 42, height: 42,
-              alignItems: 'center', justifyContent: 'center',
-              backgroundColor: '#111827',
-              borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-              borderRadius: 99,
-            }}
+            className="mb-6 w-10.5 h-10.5 items-center justify-center bg-surface border border-border rounded-full"
           >
             <ArrowLeft size={20} color="#94a3b8" />
           </TouchableOpacity>
 
-          <Text style={{ fontSize: 28, fontWeight: '900', color: '#f1f5f9', letterSpacing: -0.5 }}>Create Account</Text>
-          <Text style={{ color: '#94a3b8', marginTop: 6, fontSize: 16, marginBottom: 28 }}>Join the FindFix community today</Text>
+          <Text className="text-3xl font-black text-text-primary tracking-tight">Create Account</Text>
+          <Text className="text-text-secondary mt-1.5 text-base mb-7">Join the FindFix community today</Text>
 
           {/* Role Selection */}
-          <View style={{ flexDirection: 'row', gap: 14, marginBottom: 28 }}>
+          <View className="flex-row gap-3.5 mb-7">
             <TouchableOpacity 
               onPress={() => setRole('customer')}
-              style={{
-                flex: 1, paddingVertical: 18, borderRadius: 16, alignItems: 'center',
-                borderWidth: 2,
-                borderColor: role === 'customer' ? '#ff6b35' : 'rgba(148,163,184,0.1)',
-                backgroundColor: role === 'customer' ? 'rgba(255,107,53,0.08)' : '#111827',
-              }}
+              className={`flex-1 py-4.5 rounded-2xl items-center border-2 ${
+                role === 'customer' ? 'border-accent bg-accent/10' : 'border-border bg-surface'
+              }`}
             >
               <User size={24} color={role === 'customer' ? '#ff6b35' : '#64748b'} />
-              <Text style={{
-                marginTop: 8, fontWeight: '700',
-                color: role === 'customer' ? '#ff6b35' : '#94a3b8',
-              }}>Customer</Text>
+              <Text className={`mt-2 font-bold ${
+                role === 'customer' ? 'text-accent' : 'text-text-secondary'
+              }`}>Customer</Text>
               {role === 'customer' && (
-                <View style={{ position: 'absolute', top: 8, right: 8 }}>
+                <View className="absolute top-2 right-2">
                   <CheckCircle2 size={16} color="#ff6b35" />
                 </View>
               )}
@@ -80,20 +70,16 @@ export default function RegisterScreen({ navigation }) {
             
             <TouchableOpacity 
               onPress={() => setRole('technician')}
-              style={{
-                flex: 1, paddingVertical: 18, borderRadius: 16, alignItems: 'center',
-                borderWidth: 2,
-                borderColor: role === 'technician' ? '#ff6b35' : 'rgba(148,163,184,0.1)',
-                backgroundColor: role === 'technician' ? 'rgba(255,107,53,0.08)' : '#111827',
-              }}
+              className={`flex-1 py-4.5 rounded-2xl items-center border-2 ${
+                role === 'technician' ? 'border-accent bg-accent/10' : 'border-border bg-surface'
+              }`}
             >
               <Wrench size={24} color={role === 'technician' ? '#ff6b35' : '#64748b'} />
-              <Text style={{
-                marginTop: 8, fontWeight: '700',
-                color: role === 'technician' ? '#ff6b35' : '#94a3b8',
-              }}>Technician</Text>
+              <Text className={`mt-2 font-bold ${
+                role === 'technician' ? 'text-accent' : 'text-text-secondary'
+              }`}>Technician</Text>
               {role === 'technician' && (
-                <View style={{ position: 'absolute', top: 8, right: 8 }}>
+                <View className="absolute top-2 right-2">
                   <CheckCircle2 size={16} color="#ff6b35" />
                 </View>
               )}
@@ -109,19 +95,14 @@ export default function RegisterScreen({ navigation }) {
           ].map((field, index) => {
             const Icon = field.icon;
             return (
-              <View key={index} style={{ marginBottom: 16 }}>
-                <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '500', marginBottom: 8 }}>{field.label}</Text>
-                <View style={{
-                  flexDirection: 'row', alignItems: 'center',
-                  backgroundColor: '#1a2332',
-                  borderWidth: 1, borderColor: 'rgba(148, 163, 184, 0.1)',
-                  borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-                }}>
+              <View key={index} className="mb-4">
+                <Text className="text-text-secondary text-[13px] font-medium mb-2">{field.label}</Text>
+                <View className="flex-row items-center bg-surface-2 border border-border rounded-xl px-4 py-3.5">
                   <Icon size={18} color="#64748b" style={{ marginRight: 12 }} />
                   <TextInput
                     placeholder={field.placeholder}
                     placeholderTextColor="#64748b"
-                    style={{ flex: 1, color: '#f1f5f9', fontSize: 15 }}
+                    className="flex-1 text-text-primary text-[15px]"
                     keyboardType={field.keyboardType || 'default'}
                     autoCapitalize={field.keyboardType === 'email-address' ? 'none' : 'words'}
                     secureTextEntry={field.secure || false}
@@ -138,35 +119,21 @@ export default function RegisterScreen({ navigation }) {
             onPress={handleRegister}
             disabled={loading}
             activeOpacity={0.85}
-            style={{
-              marginTop: 12,
-              paddingVertical: 16,
-              borderRadius: 14,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#ff6b35',
-              shadowColor: '#ff6b35',
-              shadowOffset: { width: 0, height: 6 },
-              shadowOpacity: 0.35,
-              shadowRadius: 16,
-              elevation: 8,
-              opacity: loading ? 0.7 : 1,
-            }}
+            className={`mt-3 py-4 rounded-xl flex-row items-center justify-center bg-accent shadow-lg shadow-accent/40 ${loading ? 'opacity-70' : ''}`}
           >
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={{ color: '#fff', fontSize: 17, fontWeight: '800', letterSpacing: 0.3 }}>Create Account</Text>
+              <Text className="text-white text-[17px] font-extrabold tracking-wide">Create Account</Text>
             )}
           </TouchableOpacity>
 
           {/* Footer */}
-          <View style={{ marginTop: 28, alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ color: '#94a3b8', fontSize: 15 }}>Already have an account? </Text>
+          <View className="mt-7 items-center">
+            <View className="flex-row items-center">
+              <Text className="text-text-secondary text-[15px]">Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={{ color: '#ff6b35', fontWeight: '700', fontSize: 15 }}>Sign In</Text>
+                <Text className="text-accent font-bold text-[15px]">Sign In</Text>
               </TouchableOpacity>
             </View>
           </View>

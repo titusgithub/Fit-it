@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { Search, Bell, Star, ChevronRight, LogOut, Wrench, Zap, Droplets, Hammer, PenTool, Tv, Smartphone, Snowflake, Sparkles, Camera, KeyRound, Home, Flame, Truck } from 'lucide-react-native';
+import { Search, Bell, Star, ChevronRight, LogOut, Wrench, Zap, Droplets, Hammer, PenTool, Tv, Smartphone, Snowflake, Sparkles, Camera, KeyRound, Home, Flame } from 'lucide-react-native';
 import api from '../services/api';
 
 const SERVICES = [
@@ -37,7 +37,6 @@ export default function HomeScreen({ navigation }) {
   const { user, logout } = useAuth();
   const [technicians, setTechnicians] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -55,67 +54,45 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#0a0f1a' }}>
+    <View className="flex-1 bg-background">
       {/* Header */}
-      <View style={{
-        paddingHorizontal: 24, paddingTop: 56, paddingBottom: 20,
-        backgroundColor: '#111827',
-        borderBottomWidth: 1, borderBottomColor: 'rgba(148,163,184,0.1)',
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{
-              width: 44, height: 44, borderRadius: 14,
-              backgroundColor: 'rgba(255,107,53,0.12)', alignItems: 'center', justifyContent: 'center',
-              borderWidth: 1, borderColor: 'rgba(255,107,53,0.25)',
-            }}>
+      <View className="px-6 pt-14 pb-5 bg-surface border-b border-border">
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center">
+            <View className="w-11 h-11 rounded-2xl bg-accent/10 items-center justify-center border border-accent/25">
               <Image 
                 source={{ uri: user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=1e3a5f&color=f1f5f9` }} 
-                style={{ width: 38, height: 38, borderRadius: 12 }}
+                className="w-9.5 h-9.5 rounded-xl"
               />
             </View>
-            <View style={{ marginLeft: 12 }}>
-              <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '500' }}>Good Morning,</Text>
-              <Text style={{ color: '#f1f5f9', fontSize: 18, fontWeight: '800' }}>{user?.name?.split(' ')[0] || 'User'}</Text>
+            <View className="ml-3">
+              <Text className="text-text-secondary text-[13px] font-medium">Good Morning,</Text>
+              <Text className="text-text-primary text-lg font-extrabold">{user?.name?.split(' ')[0] || 'User'}</Text>
             </View>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <TouchableOpacity style={{
-              padding: 10, backgroundColor: '#1a2332', borderRadius: 12,
-              borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-            }}>
+          <View className="flex-row items-center gap-2.5">
+            <TouchableOpacity className="p-2.5 bg-surface-2 rounded-xl border border-border">
               <Bell size={20} color="#94a3b8" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={logout} style={{
-              padding: 10, backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 12,
-              borderWidth: 1, borderColor: 'rgba(239,68,68,0.15)',
-            }}>
+            <TouchableOpacity onPress={logout} className="p-2.5 bg-danger/10 rounded-xl border border-danger/15">
               <LogOut size={20} color="#ef4444" />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
-        <View style={{ paddingHorizontal: 24, paddingTop: 28, paddingBottom: 8 }}>
-          <View style={{
-            alignSelf: 'flex-start', paddingHorizontal: 14, paddingVertical: 6,
-            backgroundColor: 'rgba(255,107,53,0.1)',
-            borderWidth: 1, borderColor: 'rgba(255,107,53,0.2)',
-            borderRadius: 999, marginBottom: 16,
-          }}>
-            <Text style={{ color: '#ff6b35', fontSize: 13, fontWeight: '600' }}>🇰🇪 Kenya's #1 Technician Marketplace</Text>
+        <View className="px-6 pt-7 pb-2">
+          <View className="self-start px-3.5 py-1.5 bg-accent/10 border border-accent/20 rounded-full mb-4">
+            <Text className="text-accent text-[13px] font-semibold">🇰🇪 Kenya's #1 Technician Marketplace</Text>
           </View>
           
-          <Text style={{
-            fontSize: 30, fontWeight: '900', color: '#f1f5f9',
-            lineHeight: 36, letterSpacing: -1, marginBottom: 10,
-          }}>
+          <Text className="text-[30px] font-black text-text-primary leading-9 tracking-tighter mb-2.5">
             Find Verified{'\n'}
-            <Text style={{ color: '#ff6b35' }}>Technicians</Text> Near You
+            <Text className="text-accent">Technicians</Text> Near You
           </Text>
-          <Text style={{ color: '#94a3b8', fontSize: 15, lineHeight: 24, marginBottom: 24, maxWidth: 320 }}>
+          <Text className="text-text-secondary text-[15px] leading-6 mb-6 max-w-[320px]">
             From plumbing to electronics — connect with skilled, verified professionals. Pay securely with M-Pesa.
           </Text>
 
@@ -123,120 +100,82 @@ export default function HomeScreen({ navigation }) {
           <TouchableOpacity
             onPress={() => navigation.navigate('Search')}
             activeOpacity={0.8}
-            style={{
-              flexDirection: 'row', alignItems: 'center',
-              backgroundColor: '#111827',
-              borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-              borderRadius: 16, paddingHorizontal: 18, paddingVertical: 16,
-              shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3, shadowRadius: 12, elevation: 5,
-            }}
+            className="flex-row items-center bg-surface border border-border rounded-2xl px-4.5 py-4 shadow-lg shadow-black/30"
           >
             <Search size={20} color="#64748b" />
-            <Text style={{ flex: 1, color: '#64748b', fontSize: 15, marginLeft: 12 }}>
+            <Text className="flex-1 text-text-muted text-[15px] ml-3">
               Search services or technicians...
             </Text>
-            <View style={{
-              backgroundColor: '#ff6b35', borderRadius: 10,
-              paddingHorizontal: 16, paddingVertical: 8,
-            }}>
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Search</Text>
+            <View className="bg-accent rounded-xl px-4 py-2">
+              <Text className="text-white font-bold text-[13px]">Search</Text>
             </View>
           </TouchableOpacity>
 
           {/* Popular Tags */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
-            <Text style={{ color: '#64748b', fontSize: 13 }}>Popular:</Text>
+          <View className="flex-row items-center flex-wrap gap-2 mt-4">
+            <Text className="text-text-muted text-[13px]">Popular:</Text>
             {['Plumbing', 'Electrical', 'Phone Repair', 'Cleaning'].map((tag) => (
-              <TouchableOpacity key={tag} style={{
-                paddingHorizontal: 12, paddingVertical: 6,
-                backgroundColor: 'rgba(255,255,255,0.04)',
-                borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-                borderRadius: 999,
-              }}>
-                <Text style={{ color: '#94a3b8', fontSize: 12 }}>{tag}</Text>
+              <TouchableOpacity key={tag} className="px-3 py-1.5 bg-white/5 border border-border rounded-full">
+                <Text className="text-text-secondary text-[12px]">{tag}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
         {/* Stats Row */}
-        <View style={{ paddingHorizontal: 24, marginTop: 28 }}>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+        <View className="px-6 mt-7">
+          <View className="flex-row flex-wrap gap-2.5">
             {STATS.map((stat, i) => (
-              <View key={i} style={{
-                flex: 1, minWidth: '45%',
-                backgroundColor: '#111827',
-                borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-                borderRadius: 16, padding: 18, alignItems: 'center',
-              }}>
-                <Text style={{ fontSize: 20, fontWeight: '800', color: '#ff6b35' }}>{stat.number}</Text>
-                <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>{stat.label}</Text>
+              <View key={i} className="flex-1 min-w-[45%] bg-surface border border-border rounded-2xl p-4.5 items-center">
+                <Text className="text-xl font-extrabold text-accent">{stat.number}</Text>
+                <Text className="text-[11px] text-text-secondary mt-1">{stat.label}</Text>
               </View>
             ))}
           </View>
         </View>
 
         {/* Services Grid */}
-        <View style={{ paddingHorizontal: 24, marginTop: 36 }}>
-          <View style={{ alignItems: 'center', marginBottom: 24 }}>
-            <Text style={{ fontSize: 22, fontWeight: '800', color: '#f1f5f9' }}>Our Services</Text>
-            <Text style={{ color: '#94a3b8', fontSize: 14, marginTop: 6, textAlign: 'center' }}>
+        <View className="px-6 mt-9">
+          <View className="items-center mb-6">
+            <Text className="text-2xl font-extrabold text-text-primary">Our Services</Text>
+            <Text className="text-text-secondary text-sm mt-1.5 text-center">
               Browse through our professional services
             </Text>
           </View>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-            {SERVICES.map((service, i) => {
-              const Icon = service.icon;
-              return (
-                <TouchableOpacity
-                  key={i}
-                  onPress={() => navigation.navigate('Search', { service: service.name })}
-                  activeOpacity={0.7}
-                  style={{
-                    width: '47%',
-                    backgroundColor: '#111827',
-                    borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-                    borderRadius: 16, padding: 18,
-                  }}
-                >
-                  <Text style={{ fontSize: 28, marginBottom: 10 }}>{service.emoji}</Text>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#f1f5f9', marginBottom: 4 }}>{service.name}</Text>
-                  <Text style={{ fontSize: 12, color: '#94a3b8', lineHeight: 18 }}>{service.desc}</Text>
-                </TouchableOpacity>
-              );
-            })}
+          <View className="flex-row flex-wrap justify-between gap-y-3">
+            {SERVICES.map((service, i) => (
+              <TouchableOpacity
+                key={i}
+                onPress={() => navigation.navigate('Search', { service: service.name })}
+                activeOpacity={0.7}
+                className="w-[48%] bg-surface border border-border rounded-2xl p-4.5"
+              >
+                <Text className="text-2xl mb-2.5">{service.emoji}</Text>
+                <Text className="text-sm font-bold text-text-primary mb-1">{service.name}</Text>
+                <Text className="text-xs text-text-secondary leading-4">{service.desc}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
         {/* How It Works */}
-        <View style={{
-          marginTop: 36, paddingVertical: 36, paddingHorizontal: 24,
-          backgroundColor: '#111827',
-          borderTopWidth: 1, borderBottomWidth: 1,
-          borderColor: 'rgba(148,163,184,0.1)',
-        }}>
-          <View style={{ alignItems: 'center', marginBottom: 24 }}>
-            <Text style={{ fontSize: 22, fontWeight: '800', color: '#f1f5f9' }}>How It Works</Text>
-            <Text style={{ color: '#94a3b8', fontSize: 14, marginTop: 6, textAlign: 'center' }}>
+        <View className="mt-9 py-9 px-6 bg-surface border-y border-border">
+          <View className="items-center mb-6">
+            <Text className="text-2xl font-extrabold text-text-primary">How It Works</Text>
+            <Text className="text-text-secondary text-sm mt-1.5 text-center">
               Getting your problems fixed is easy
             </Text>
           </View>
-          <View style={{ gap: 16 }}>
+          <View className="gap-4">
             {STEPS.map((item, i) => (
-              <View key={i} style={{
-                backgroundColor: '#0a0f1a',
-                borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-                borderRadius: 16, padding: 20,
-                flexDirection: 'row', alignItems: 'center',
-              }}>
-                <Text style={{ fontSize: 32, fontWeight: '900', color: 'rgba(255,107,53,0.15)', marginRight: 16 }}>{item.step}</Text>
-                <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <Text style={{ fontSize: 20 }}>{item.emoji}</Text>
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#f1f5f9' }}>{item.title}</Text>
+              <View key={i} className="bg-background border border-border rounded-2xl p-5 flex-row items-center">
+                <Text className="text-3xl font-black text-accent/15 mr-4">{item.step}</Text>
+                <View className="flex-1">
+                  <View className="flex-row items-center gap-2 mb-1">
+                    <Text className="text-xl">{item.emoji}</Text>
+                    <Text className="text-base font-bold text-text-primary">{item.title}</Text>
                   </View>
-                  <Text style={{ fontSize: 13, color: '#94a3b8', lineHeight: 20 }}>{item.desc}</Text>
+                  <Text className="text-[13px] text-text-secondary leading-5">{item.desc}</Text>
                 </View>
               </View>
             ))}
@@ -244,44 +183,36 @@ export default function HomeScreen({ navigation }) {
         </View>
 
         {/* Popular Technicians */}
-        <View style={{ paddingHorizontal: 24, marginTop: 36 }}>
-          <Text style={{ fontSize: 22, fontWeight: '800', color: '#f1f5f9', marginBottom: 18 }}>Popular Technicians</Text>
+        <View className="px-6 mt-9">
+          <Text className="text-2xl font-extrabold text-text-primary mb-4.5">Popular Technicians</Text>
           
           {loading ? (
-            <ActivityIndicator color="#ff6b35" size="large" style={{ paddingVertical: 40 }} />
+            <ActivityIndicator color="#ff6b35" size="large" className="py-10" />
           ) : technicians.length > 0 ? (
-            <View style={{ gap: 14 }}>
+            <View className="gap-3.5">
               {technicians.map((tech) => (
                 <TouchableOpacity
                   key={tech.id}
                   activeOpacity={0.7}
-                  style={{
-                    backgroundColor: '#111827',
-                    borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-                    borderRadius: 16, padding: 18,
-                    flexDirection: 'row', alignItems: 'center',
-                  }}
+                  className="bg-surface border border-border rounded-2xl p-4.5 flex-row items-center"
                 >
-                  <View style={{
-                    width: 56, height: 56, borderRadius: 16, overflow: 'hidden',
-                    backgroundColor: '#1a2332',
-                  }}>
+                  <View className="w-14 h-14 rounded-2xl overflow-hidden bg-surface-2">
                     <Image
                       source={{ uri: tech.avatar_url || `https://ui-avatars.com/api/?name=${tech.name}&background=1e3a5f&color=f1f5f9` }}
-                      style={{ width: 56, height: 56 }}
+                      className="w-14 h-14"
                     />
                   </View>
-                  <View style={{ marginLeft: 14, flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#f1f5f9' }}>{tech.name}</Text>
-                    <Text style={{ fontSize: 13, color: '#94a3b8', marginTop: 2 }} numberOfLines={1}>
+                  <View className="ml-3.5 flex-1">
+                    <Text className="text-base font-bold text-text-primary">{tech.name}</Text>
+                    <Text className="text-[13px] text-text-secondary mt-0.5" numberOfLines={1}>
                       {tech.bio || 'Professional Technician'}
                     </Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 }}>
+                    <View className="flex-row items-center mt-1.5 gap-1.5">
                       <Star size={13} color="#f59e0b" fill="#f59e0b" />
-                      <Text style={{ fontSize: 12, fontWeight: '700', color: '#f1f5f9' }}>
+                      <Text className="text-xs font-bold text-text-primary">
                         {Number(tech.avg_rating || 5).toFixed(1)}
                       </Text>
-                      <Text style={{ fontSize: 12, color: '#64748b' }}>
+                      <Text className="text-xs text-text-muted">
                         • {tech.total_jobs || 0} jobs done
                       </Text>
                     </View>
@@ -291,45 +222,33 @@ export default function HomeScreen({ navigation }) {
               ))}
             </View>
           ) : (
-            <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-              <Text style={{ color: '#94a3b8' }}>No technicians available yet</Text>
+            <View className="py-10 items-center">
+              <Text className="text-text-secondary">No technicians available yet</Text>
             </View>
           )}
         </View>
 
         {/* CTA Section */}
-        <View style={{ paddingHorizontal: 24, marginTop: 36, marginBottom: 40 }}>
-          <View style={{
-            borderRadius: 20, padding: 32, alignItems: 'center',
-            backgroundColor: 'rgba(255,107,53,0.06)',
-            borderWidth: 1, borderColor: 'rgba(255,107,53,0.15)',
-          }}>
-            <Text style={{ fontSize: 22, fontWeight: '800', color: '#f1f5f9', textAlign: 'center', marginBottom: 8 }}>
+        <View className="px-6 mt-9 mb-10">
+          <View className="rounded-3xl p-8 items-center bg-accent/5 border border-accent/15">
+            <Text className="text-2xl font-extrabold text-text-primary text-center mb-2">
               Ready to Get Started?
             </Text>
-            <Text style={{ fontSize: 14, color: '#94a3b8', textAlign: 'center', marginBottom: 24 }}>
+            <Text className="text-sm text-text-secondary text-center mb-6">
               Join thousands of satisfied customers and verified technicians on FindFix
             </Text>
-            <View style={{ flexDirection: 'row', gap: 12 }}>
+            <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => navigation.navigate('Search')}
-                style={{
-                  backgroundColor: '#ff6b35', borderRadius: 14,
-                  paddingVertical: 14, paddingHorizontal: 22,
-                  shadowColor: '#ff6b35', shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
-                }}
+                className="bg-accent rounded-2xl py-3.5 px-5.5 shadow-lg shadow-accent/30"
               >
-                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>Find a Technician</Text>
+                <Text className="text-white font-bold text-sm">Find a Tech</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate('Register')}
-                style={{
-                  borderRadius: 14, paddingVertical: 14, paddingHorizontal: 22,
-                  borderWidth: 2, borderColor: '#ff6b35',
-                }}
+                className="rounded-2xl py-3.5 px-5.5 border-2 border-accent"
               >
-                <Text style={{ color: '#ff6b35', fontWeight: '700', fontSize: 14 }}>Join as Tech</Text>
+                <Text className="text-accent font-bold text-sm">Join as Tech</Text>
               </TouchableOpacity>
             </View>
           </View>

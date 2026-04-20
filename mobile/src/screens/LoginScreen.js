@@ -29,59 +29,41 @@ export default function LoginScreen({ navigation }) {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1, backgroundColor: '#0a0f1a' }}
+      className="flex-1 bg-background"
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1, paddingHorizontal: 28, paddingTop: 100, paddingBottom: 48 }}>
+        <View className="flex-1 px-7 pt-24 pb-12">
           {/* Logo Section */}
-          <View style={{ alignItems: 'center', marginBottom: 48 }}>
-            <View style={{
-              width: 72, height: 72,
-              backgroundColor: 'rgba(255, 107, 53, 0.12)',
-              borderRadius: 22,
-              alignItems: 'center', justifyContent: 'center',
-              borderWidth: 1, borderColor: 'rgba(255, 107, 53, 0.25)',
-            }}>
+          <View className="items-center mb-12">
+            <View className="w-18 h-18 bg-accent/10 rounded-2xl items-center justify-center border border-accent/20">
               <Wrench size={36} color="#ff6b35" />
             </View>
-            <Text style={{
-              fontSize: 32, fontWeight: '900', color: '#f1f5f9',
-              marginTop: 20, letterSpacing: -1,
-            }}>FindFix</Text>
-            <Text style={{
-              color: '#94a3b8', marginTop: 6, fontSize: 16,
-            }}>Kenya's #1 Technician Marketplace</Text>
+            <Text className="text-3xl font-black text-text-primary mt-5 tracking-tighter">
+              FindFix
+            </Text>
+            <Text className="text-text-secondary mt-1.5 text-base">
+              Kenya's #1 Technician Marketplace
+            </Text>
           </View>
 
           {/* Glass Card */}
-          <View style={{
-            backgroundColor: 'rgba(255,255,255,0.04)',
-            borderRadius: 20,
-            padding: 28,
-            borderWidth: 1,
-            borderColor: 'rgba(148, 163, 184, 0.1)',
-          }}>
-            <Text style={{
-              fontSize: 22, fontWeight: '800', color: '#f1f5f9', marginBottom: 4,
-            }}>Welcome Back</Text>
-            <Text style={{
-              color: '#94a3b8', marginBottom: 28, fontSize: 14,
-            }}>Sign in to your FindFix account</Text>
+          <View className="bg-white/5 rounded-2xl p-7 border border-border">
+            <Text className="text-2xl font-extrabold text-text-primary mb-1">
+              Welcome Back
+            </Text>
+            <Text className="text-text-secondary mb-7 text-sm">
+              Sign in to your FindFix account
+            </Text>
 
             {/* Email */}
-            <View style={{ marginBottom: 18 }}>
-              <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '500', marginBottom: 8 }}>Email Address</Text>
-              <View style={{
-                flexDirection: 'row', alignItems: 'center',
-                backgroundColor: '#1a2332',
-                borderWidth: 1, borderColor: 'rgba(148, 163, 184, 0.1)',
-                borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-              }}>
+            <View className="mb-4.5">
+              <Text className="text-text-secondary text-[13px] font-medium mb-2">Email Address</Text>
+              <View className="flex-row items-center bg-surface-2 border border-border rounded-xl px-4 py-3.5">
                 <Mail size={18} color="#64748b" style={{ marginRight: 12 }} />
                 <TextInput
                   placeholder="you@example.com"
                   placeholderTextColor="#64748b"
-                  style={{ flex: 1, color: '#f1f5f9', fontSize: 15 }}
+                  className="flex-1 text-text-primary text-[15px]"
                   keyboardType="email-address"
                   autoCapitalize="none"
                   value={email}
@@ -91,19 +73,14 @@ export default function LoginScreen({ navigation }) {
             </View>
 
             {/* Password */}
-            <View style={{ marginBottom: 8 }}>
-              <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '500', marginBottom: 8 }}>Password</Text>
-              <View style={{
-                flexDirection: 'row', alignItems: 'center',
-                backgroundColor: '#1a2332',
-                borderWidth: 1, borderColor: 'rgba(148, 163, 184, 0.1)',
-                borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-              }}>
+            <View className="mb-2">
+              <Text className="text-text-secondary text-[13px] font-medium mb-2">Password</Text>
+              <View className="flex-row items-center bg-surface-2 border border-border rounded-xl px-4 py-3.5">
                 <Lock size={18} color="#64748b" style={{ marginRight: 12 }} />
                 <TextInput
                   placeholder="••••••••"
                   placeholderTextColor="#64748b"
-                  style={{ flex: 1, color: '#f1f5f9', fontSize: 15 }}
+                  className="flex-1 text-text-primary text-[15px]"
                   secureTextEntry
                   value={password}
                   onChangeText={setPassword}
@@ -116,30 +93,15 @@ export default function LoginScreen({ navigation }) {
               onPress={handleLogin}
               disabled={loading}
               activeOpacity={0.85}
-              style={{
-                marginTop: 24,
-                paddingVertical: 16,
-                borderRadius: 14,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#ff6b35',
-                shadowColor: '#ff6b35',
-                shadowOffset: { width: 0, height: 6 },
-                shadowOpacity: 0.35,
-                shadowRadius: 16,
-                elevation: 8,
-                opacity: loading ? 0.7 : 1,
-              }}
+              className={`mt-6 py-4 rounded-xl flex-row items-center justify-center bg-accent shadow-lg shadow-accent/40 ${loading ? 'opacity-70' : ''}`}
             >
               {loading ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <>
-                  <Text style={{
-                    color: '#fff', fontSize: 17, fontWeight: '800',
-                    letterSpacing: 0.3, marginRight: 6,
-                  }}>Sign In</Text>
+                  <Text className="text-white text-lg font-extrabold tracking-wide mr-1.5">
+                    Sign In
+                  </Text>
                   <ArrowRight size={20} color="white" />
                 </>
               )}
@@ -147,11 +109,11 @@ export default function LoginScreen({ navigation }) {
           </View>
 
           {/* Footer */}
-          <View style={{ marginTop: 'auto', alignItems: 'center', paddingTop: 32 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ color: '#94a3b8', fontSize: 15 }}>Don't have an account? </Text>
+          <View className="mt-auto items-center pt-8">
+            <View className="flex-row items-center">
+              <Text className="text-text-secondary text-[15px]">Don't have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                <Text style={{ color: '#ff6b35', fontWeight: '700', fontSize: 15 }}>Sign Up</Text>
+                <Text className="text-accent font-bold text-[15px]">Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>

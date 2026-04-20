@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
-import { ArrowLeft, Search, Star, MapPin, ChevronRight, Filter } from 'lucide-react-native';
+import { ArrowLeft, Search, Star, MapPin, ChevronRight } from 'lucide-react-native';
 import api from '../services/api';
 
 function StarRating({ rating }) {
   return (
-    <View style={{ flexDirection: 'row', gap: 2 }}>
+    <View className="flex-row gap-0.5">
       {[1, 2, 3, 4, 5].map((i) => (
-        <Text key={i} style={{ fontSize: 12, color: i <= Math.round(rating) ? '#f59e0b' : '#64748b' }}>★</Text>
+        <Text key={i} className={`text-xs ${i <= Math.round(rating) ? 'text-warning' : 'text-text-muted'}`}>★</Text>
       ))}
     </View>
   );
@@ -58,43 +58,29 @@ export default function SearchScreen({ route, navigation }) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#0a0f1a' }}>
+    <View className="flex-1 bg-background">
       {/* Header */}
-      <View style={{
-        paddingHorizontal: 24, paddingTop: 56, paddingBottom: 16,
-        backgroundColor: '#111827',
-        borderBottomWidth: 1, borderBottomColor: 'rgba(148,163,184,0.1)',
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 18 }}>
+      <View className="px-6 pt-14 pb-4 bg-surface border-b border-border">
+        <View className="flex-row items-center mb-4.5">
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{
-              marginRight: 14, padding: 8,
-              backgroundColor: '#1a2332', borderRadius: 99,
-              borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-            }}
+            className="mr-3.5 p-2 bg-surface-2 rounded-full border border-border"
           >
             <ArrowLeft size={20} color="#94a3b8" />
           </TouchableOpacity>
           <View>
-            <Text style={{ color: '#f1f5f9', fontSize: 20, fontWeight: '800' }}>Find Technicians</Text>
-            <Text style={{ color: '#94a3b8', fontSize: 13 }}>Browse verified professionals near you</Text>
+            <Text className="text-text-primary text-xl font-extrabold">Find Technicians</Text>
+            <Text className="text-text-secondary text-[13px]">Browse verified professionals near you</Text>
           </View>
         </View>
 
         {/* Search Input */}
-        <View style={{
-          flexDirection: 'row', alignItems: 'center',
-          backgroundColor: '#1a2332',
-          borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-          borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12,
-          marginBottom: 12,
-        }}>
+        <View className="flex-row items-center bg-surface-2 border border-border rounded-xl px-3.5 py-3 mb-3">
           <Search size={18} color="#64748b" />
           <TextInput
             placeholder="Search by name..."
             placeholderTextColor="#64748b"
-            style={{ flex: 1, color: '#f1f5f9', fontSize: 14, marginLeft: 10 }}
+            className="flex-1 text-text-primary text-sm ml-2.5"
             value={filters.search}
             onChangeText={(t) => setFilters({ ...filters, search: t })}
             onSubmitEditing={fetchTechnicians}
@@ -102,132 +88,98 @@ export default function SearchScreen({ route, navigation }) {
         </View>
 
         {/* Filters Row */}
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View style={{
-            flex: 1,
-            flexDirection: 'row', alignItems: 'center',
-            backgroundColor: '#1a2332',
-            borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-            borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
-          }}>
+        <View className="flex-row gap-2.5">
+          <View className="flex-1 flex-row items-center bg-surface-2 border border-border rounded-xl px-3.5 py-3">
             <MapPin size={16} color="#64748b" />
             <TextInput
               placeholder="Location..."
               placeholderTextColor="#64748b"
-              style={{ flex: 1, color: '#f1f5f9', fontSize: 13, marginLeft: 8 }}
+              className="flex-1 text-text-primary text-[13px] ml-2"
               value={filters.location}
               onChangeText={(t) => setFilters({ ...filters, location: t })}
             />
           </View>
           <TouchableOpacity
             onPress={fetchTechnicians}
-            style={{
-              backgroundColor: '#ff6b35', borderRadius: 12,
-              paddingHorizontal: 20, justifyContent: 'center',
-              shadowColor: '#ff6b35', shadowOffset: { width: 0, height: 3 },
-              shadowOpacity: 0.3, shadowRadius: 8, elevation: 4,
-            }}
+            className="bg-accent rounded-xl px-5 justify-center shadow-md shadow-accent/30"
           >
-            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>Search</Text>
+            <Text className="text-white font-bold text-sm">Search</Text>
           </TouchableOpacity>
         </View>
 
         {/* Service Filter Chips */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 14 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-3.5 pt-1">
           <TouchableOpacity
             onPress={() => { setFilters({ ...filters, service: '' }); }}
-            style={{
-              paddingHorizontal: 14, paddingVertical: 8, marginRight: 8,
-              borderRadius: 999,
-              backgroundColor: !filters.service ? '#ff6b35' : '#1a2332',
-              borderWidth: 1,
-              borderColor: !filters.service ? '#ff6b35' : 'rgba(148,163,184,0.1)',
-            }}
+            className={`px-3.5 py-2 mr-2 rounded-full border ${
+              !filters.service ? 'bg-accent border-accent' : 'bg-surface-2 border-border'
+            }`}
           >
-            <Text style={{ fontSize: 12, fontWeight: '600', color: !filters.service ? '#fff' : '#94a3b8' }}>All</Text>
+            <Text className={`text-xs font-semibold ${!filters.service ? 'text-white' : 'text-text-secondary'}`}>All</Text>
           </TouchableOpacity>
           {services.slice(0, 8).map((s) => (
             <TouchableOpacity
               key={s.id}
               onPress={() => { setFilters({ ...filters, service: s.name }); }}
-              style={{
-                paddingHorizontal: 14, paddingVertical: 8, marginRight: 8,
-                borderRadius: 999,
-                backgroundColor: filters.service === s.name ? '#ff6b35' : '#1a2332',
-                borderWidth: 1,
-                borderColor: filters.service === s.name ? '#ff6b35' : 'rgba(148,163,184,0.1)',
-              }}
+              className={`px-3.5 py-2 mr-2 rounded-full border ${
+                filters.service === s.name ? 'bg-accent border-accent' : 'bg-surface-2 border-border'
+              }`}
             >
-              <Text style={{
-                fontSize: 12, fontWeight: '600',
-                color: filters.service === s.name ? '#fff' : '#94a3b8',
-              }}>{s.icon} {s.name}</Text>
+              <Text className={`text-xs font-semibold ${
+                filters.service === s.name ? 'text-white' : 'text-text-secondary'
+              }`}>{s.icon} {s.name}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
 
       {/* Results */}
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 40 }}>
+      <ScrollView className="flex-1" contentContainerStyle={{ padding: 24, paddingBottom: 40 }}>
         {loading ? (
-          <View style={{ gap: 16 }}>
+          <View className="gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <View key={i} style={{
-                backgroundColor: '#111827', borderRadius: 16, padding: 20,
-                borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-                flexDirection: 'row', alignItems: 'center',
-              }}>
-                <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#1a2332' }} />
-                <View style={{ marginLeft: 14, flex: 1, gap: 8 }}>
-                  <View style={{ width: '50%', height: 16, backgroundColor: '#1a2332', borderRadius: 8 }} />
-                  <View style={{ width: '75%', height: 12, backgroundColor: '#1a2332', borderRadius: 6 }} />
-                  <View style={{ width: '35%', height: 12, backgroundColor: '#1a2332', borderRadius: 6 }} />
+              <View key={i} className="bg-surface rounded-2xl p-5 border border-border flex-row items-center">
+                <View className="w-15 h-15 rounded-full bg-surface-2" />
+                <View className="ml-3.5 flex-1 gap-2">
+                  <View className="w-1/2 h-4 bg-surface-2 rounded-md" />
+                  <View className="w-3/4 h-3 bg-surface-2 rounded-md" />
+                  <View className="w-1/3 h-3 bg-surface-2 rounded-md" />
                 </View>
               </View>
             ))}
           </View>
         ) : technicians.length > 0 ? (
           <>
-            <Text style={{ color: '#94a3b8', fontSize: 13, marginBottom: 16 }}>
+            <Text className="text-text-secondary text-[13px] mb-4">
               {technicians.length} technician{technicians.length > 1 ? 's' : ''} found
             </Text>
-            <View style={{ gap: 14 }}>
+            <View className="gap-3.5">
               {technicians.map((tech) => (
                 <TouchableOpacity
                   key={tech.id}
                   activeOpacity={0.7}
-                  style={{
-                    backgroundColor: '#111827',
-                    borderWidth: 1, borderColor: 'rgba(148,163,184,0.1)',
-                    borderRadius: 16, padding: 18,
-                  }}
+                  className="bg-surface border border-border rounded-2xl p-4.5"
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{
-                      width: 60, height: 60, borderRadius: 30, overflow: 'hidden',
-                      backgroundColor: '#1a2332',
-                    }}>
+                  <View className="flex-row items-center">
+                    <View className="w-15 h-15 rounded-full overflow-hidden bg-surface-2">
                       <Image
                         source={{ uri: tech.avatar_url || `https://ui-avatars.com/api/?name=${tech.name}&background=1e3a5f&color=f1f5f9` }}
-                        style={{ width: 60, height: 60 }}
+                        className="w-15 h-15"
                       />
                     </View>
-                    <View style={{ marginLeft: 14, flex: 1 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                        <Text style={{ fontSize: 16, fontWeight: '700', color: '#f1f5f9' }}>{tech.name}</Text>
+                    <View className="ml-3.5 flex-1">
+                      <View className="flex-row items-center gap-1.5">
+                        <Text className="text-base font-bold text-text-primary">{tech.name}</Text>
                         {tech.is_verified && (
-                          <View style={{
-                            backgroundColor: 'rgba(16,185,129,0.15)', borderRadius: 99,
-                            paddingHorizontal: 6, paddingVertical: 2,
-                          }}>
-                            <Text style={{ fontSize: 10, color: '#10b981', fontWeight: '700' }}>✓</Text>
+                          <View className="bg-success/15 rounded-full px-1.5 py-0.5">
+                            <Text className="text-[10px] text-success font-bold">✓</Text>
                           </View>
                         )}
                       </View>
-                      <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>📍 {tech.location || 'Kenya'}</Text>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 }}>
+                      <Text className="text-xs text-text-secondary mt-1">📍 {tech.location || 'Kenya'}</Text>
+                      <View className="flex-row items-center mt-1.5 gap-1.5">
                         <StarRating rating={tech.avg_rating || 0} />
-                        <Text style={{ fontSize: 12, color: '#94a3b8' }}>
+                        <Text className="text-xs text-text-secondary">
                           {tech.avg_rating ? `${Number(tech.avg_rating).toFixed(1)}` : 'New'} ({tech.total_reviews || 0})
                         </Text>
                       </View>
@@ -236,38 +188,32 @@ export default function SearchScreen({ route, navigation }) {
                   </View>
                   
                   {tech.bio && (
-                    <Text style={{ fontSize: 13, color: '#64748b', marginTop: 12, lineHeight: 20 }} numberOfLines={2}>
+                    <Text className="text-[13px] text-text-muted mt-3 leading-5" numberOfLines={2}>
                       {tech.bio}
                     </Text>
                   )}
 
-                  <View style={{ flexDirection: 'row', marginTop: 12, gap: 8 }}>
-                    <View style={{
-                      backgroundColor: 'rgba(255,107,53,0.1)', borderRadius: 999,
-                      paddingHorizontal: 10, paddingVertical: 4,
-                    }}>
-                      <Text style={{ fontSize: 11, color: '#ff6b35', fontWeight: '600' }}>
+                  <View className="flex-row mt-3 gap-2">
+                    <View className="bg-accent/10 rounded-full px-2.5 py-1">
+                      <Text className="text-[11px] text-accent font-semibold">
                         {tech.years_experience || 0} yrs exp
                       </Text>
                     </View>
-                    <View style={{
-                      backgroundColor: 'rgba(30,58,95,0.2)', borderRadius: 999,
-                      paddingHorizontal: 10, paddingVertical: 4,
-                    }}>
-                      <Text style={{ fontSize: 11, color: '#2a5280', fontWeight: '600' }}>
+                    <View className="bg-primary-light/20 rounded-full px-2.5 py-1">
+                      <Text className="text-[11px] text-primary-light font-semibold">
                         {tech.total_jobs || 0} jobs
                       </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
-              ))}
+               ))}
             </View>
           </>
         ) : (
-          <View style={{ alignItems: 'center', paddingVertical: 60 }}>
-            <Text style={{ fontSize: 40, marginBottom: 16 }}>🔍</Text>
-            <Text style={{ fontSize: 18, fontWeight: '700', color: '#f1f5f9', marginBottom: 8 }}>No technicians found</Text>
-            <Text style={{ color: '#94a3b8', textAlign: 'center' }}>Try adjusting your search filters or check back later</Text>
+          <View className="items-center py-15">
+            <Text className="text-4xl mb-4">🔍</Text>
+            <Text className="text-lg font-bold text-text-primary mb-2">No technicians found</Text>
+            <Text className="text-text-secondary text-center">Try adjusting your search filters or check back later</Text>
           </View>
         )}
       </ScrollView>
