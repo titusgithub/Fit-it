@@ -26,14 +26,17 @@ function setupSocket(io) {
         const { request_id, sender_id, receiver_id, content } = data;
 
         // Save to database
-        const result = await pool.query(
-          `INSERT INTO messages (request_id, sender_id, receiver_id, content)
-           VALUES ($1, $2, $3, $4) RETURNING *`,
-          [request_id, sender_id, receiver_id, content]
+        const messageId = require('crypto').randomUUID();
+        await pool.query(
+          `INSERT INTO messages (id, request_id, sender_id, receiver_id, content)
+           VALUES (?, ?, ?, ?, ?)`,
+          [messageId, request_id, sender_id, receiver_id, content]
         );
+        
+        const result = await pool.query('SELECT * FROM messages WHERE id = ?', [messageId]);
 
         const sender = await pool.query(
-          'SELECT name, avatar_url FROM users WHERE id = $1',
+          'SELECT name, avatar_url FROM users WHERE id = ?',
           [sender_id]
         );
 

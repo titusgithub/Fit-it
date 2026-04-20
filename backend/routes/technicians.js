@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
         ) as services
       FROM technicians t
       JOIN users u ON t.user_id = u.id
-      WHERE u.is_active = true AND t.subscription_expires_at > NOW()
+      WHERE u.is_active = true AND (t.subscription_expires_at IS NULL OR t.subscription_expires_at > NOW())
     `;
 
     if (verified !== undefined) {
@@ -84,7 +84,7 @@ router.get('/:id', async (req, res) => {
       SELECT r.*, u.name as reviewer_name, u.avatar_url as reviewer_avatar
       FROM reviews r
       JOIN users u ON r.reviewer_id = u.id
-      WHERE r.technician_id = $1
+      WHERE r.technician_id = ?
       ORDER BY r.created_at DESC LIMIT 10
     `, [req.params.id]);
 
@@ -121,7 +121,7 @@ router.post('/services', authenticate, authorize('technician'), async (req, res)
   try {
     const { service_id, price_from, price_to } = req.body;
 
-    const tech = await pool.query('SELECT id FROM technicians WHERE user_id = $1', [req.user.id]);
+    const tech = await pool.query('SELECT id FROM technicians WHERE user_id = ?', [req.user.id]);
     if (tech.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
 
     const result = await pool.query(
@@ -142,9 +142,9 @@ router.post('/services', authenticate, authorize('technician'), async (req, res)
 // Remove service from technician
 router.delete('/services/:serviceId', authenticate, authorize('technician'), async (req, res) => {
   try {
-    const tech = await pool.query('SELECT id FROM technicians WHERE user_id = $1', [req.user.id]);
+    const tech = await pool.query('SELECT id FROM technicians WHERE user_id = ?', [req.user.id]);
     await pool.query(
-      'DELETE FROM technician_services WHERE technician_id = $1 AND service_id = $2',
+      'DELETE FROM technician_services WHERE technician_id = ? AND service_id = ?',
       [tech.rows[0].id, req.params.serviceId]
     );
     res.json({ message: 'Service removed' });
@@ -158,7 +158,7 @@ router.delete('/services/:serviceId', authenticate, authorize('technician'), asy
 router.get('/me/subscription', authenticate, authorize('technician'), async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT subscription_expires_at FROM technicians WHERE user_id = $1',
+      'SELECT subscription_expires_at FROM technicians WHERE user_id = ?',
       [req.user.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
