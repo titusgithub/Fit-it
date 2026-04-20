@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const pool = require('./config/db');
 const setupSocket = require('./socket');

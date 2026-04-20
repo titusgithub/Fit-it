@@ -1,5 +1,6 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 let pool;
 
@@ -14,9 +15,13 @@ const poolConfig = {
   queueLimit: 0,
 };
 
-if (process.env.USE_MOCK_DB === 'true') {
+const switchToMock = () => {
   console.log('⚠️ Using MOCK Database (In-Memory)');
   pool = require('./mockDb');
+};
+
+if (process.env.USE_MOCK_DB === 'true') {
+  switchToMock();
 } else {
   pool = mysql.createPool(poolConfig);
 
@@ -28,8 +33,9 @@ if (process.env.USE_MOCK_DB === 'true') {
     })
     .catch(err => {
       console.error('❌ MySQL connection failed:', err.message);
-      if (err.code === 'ECONNREFUSED' || err.code === 'ER_ACCESS_DENIED_ERROR') {
-        module.exports.useMock();
+      if (err.code === 'ECONNREFUSED' || err.code === 'ER_ACCESS_DENIED_ERROR' || err.code === 'ENOTFOUND') {
+        console.log('⚠️ Switching to MOCK Database fallback...');
+        switchToMock();
       }
     });
 }
@@ -43,7 +49,9 @@ const wrapper = {
     const cleanedText = mysqlText.replace(/\s+RETURNING\s+\*/gi, '');
     
     try {
-      const [rows] = await pool.query(cleanedText, params);
+      const result = await pool.query(cleanedText, params);
+      // mysql2 returns [rows, fields], mockDb returns { rows: [...] }
+      const rows = Array.isArray(result) ? result[0] : (result.rows || []);
       return { rows: Array.isArray(rows) ? rows : [rows] };
     } catch (err) {
       // Re-throw to be caught by route handlers
@@ -56,10 +64,7 @@ const wrapper = {
       // For now, MySQL2 pool doesn't have identical 'error' event handling like pg
     }
   },
-  useMock: () => {
-    console.log('⚠️ Switching to MOCK Database...');
-    pool = require('./mockDb');
-  }
+  useMock: switchToMock
 };
 
 module.exports = wrapper;

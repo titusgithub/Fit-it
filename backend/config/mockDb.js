@@ -2,17 +2,43 @@ const { v4: uuidv4 } = require('uuid');
 
 class MockPool {
   constructor() {
+    const serviceIds = {
+      plumbing: uuidv4(),
+      electrical: uuidv4(),
+      carpentry: uuidv4()
+    };
+
     this.data = {
-      users: [],
-      technicians: [],
-      services: [
-        { id: uuidv4(), name: 'Plumbing', description: 'Pipe repairs', icon: '🔧', category: 'Home Repairs' },
-        { id: uuidv4(), name: 'Electrical', description: 'Wiring', icon: '⚡', category: 'Home Repairs' },
-        { id: uuidv4(), name: 'Carpentry', description: 'Woodwork', icon: '🪚', category: 'Home Repairs' },
-        { id: uuidv4(), name: 'Painting', description: 'Interior/Exterior', icon: '🎨', category: 'Home Repairs' },
-        { id: uuidv4(), name: 'Appliance Repair', description: 'Electronics', icon: '📺', category: 'Electronics' }
+      users: [
+        { id: 'user-1', name: 'Titus Njuguna', email: 'titus@example.com', phone: '0712345678', password_hash: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/Pyv.tZzP.r3W3fGai', role: 'technician', is_active: true, avatar_url: 'https://i.pravatar.cc/150?u=1' },
+        { id: 'user-2', name: 'Sarah Wanjiku', email: 'sarah@example.com', phone: '0722334455', password_hash: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/Pyv.tZzP.r3W3fGai', role: 'technician', is_active: true, avatar_url: 'https://i.pravatar.cc/150?u=2' },
+        { id: 'user-3', name: 'Peter Kamau', email: 'peter@example.com', phone: '0733445566', password_hash: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/Pyv.tZzP.r3W3fGai', role: 'customer', is_active: true, avatar_url: 'https://i.pravatar.cc/150?u=3' }
       ],
-      technician_services: [],
+      technicians: [
+        { 
+          id: 'tech-1', user_id: 'user-1', is_verified: true, is_available: true, 
+          subscription_expires_at: '2027-01-01', avg_rating: 4.9, total_reviews: 24, total_jobs: 112, 
+          bio: 'Expert master plumber with 15 years experience in residential and commercial piping.', 
+          location: 'Nairobi, Westlands', years_experience: 15 
+        },
+        { 
+          id: 'tech-2', user_id: 'user-2', is_verified: true, is_available: true, 
+          subscription_expires_at: '2027-01-01', avg_rating: 4.7, total_reviews: 18, total_jobs: 85, 
+          bio: 'Certified electrician specializing in home wiring and smart home systems.', 
+          location: 'Nairobi, Kilimani', years_experience: 8 
+        }
+      ],
+      services: [
+        { id: serviceIds.plumbing, name: 'Plumbing', description: 'Pipe repairs and installation', icon: '🔧', category: 'Home Repairs' },
+        { id: serviceIds.electrical, name: 'Electrical', description: 'Wiring and appliance repair', icon: '⚡', category: 'Home Repairs' },
+        { id: serviceIds.carpentry, name: 'Carpentry', description: 'Furniture and wood repair', icon: '🪚', category: 'Home Repairs' },
+        { id: uuidv4(), name: 'Painting', description: 'Interior and exterior painting', icon: '🎨', category: 'Home Repairs' },
+        { id: uuidv4(), name: 'Cleaning', description: 'Deep house cleaning', icon: '🧹', category: 'Cleaning' }
+      ],
+      technician_services: [
+        { id: uuidv4(), technician_id: 'tech-1', service_id: serviceIds.plumbing, price_from: 1500, price_to: 5000 },
+        { id: uuidv4(), technician_id: 'tech-2', service_id: serviceIds.electrical, price_from: 1000, price_to: 4000 }
+      ],
       service_requests: [],
       reviews: [],
       transactions: [],
@@ -23,25 +49,28 @@ class MockPool {
 
   async query(text, params) {
     const q = text.trim().toUpperCase().replace(/\s+/g, ' ');
-    // console.log('MockDB Query:', q, params);
+    const p = params || [];
 
-    // 1. CHECK IF USER EXISTS (Register)
-    if (q.includes('SELECT ID FROM USERS WHERE EMAIL = $1 OR PHONE = $2')) {
-      const email = params[0];
-      const phone = params[1];
+    // Helper to check if query contains any of the patterns
+    const contains = (patterns) => patterns.some(pattern => q.includes(pattern.toUpperCase()));
+
+    // 1. CHECK IF USER EXISTS
+    if (contains(['SELECT ID FROM USERS WHERE EMAIL = $1 OR PHONE = $2', 'SELECT ID FROM USERS WHERE EMAIL = ? OR PHONE = ?'])) {
+      const email = p[0];
+      const phone = p[1];
       const user = this.data.users.find(u => u.email === email || u.phone === phone);
       return { rows: user ? [user] : [] };
     }
 
     // 2. INSERT USER
-    if (q.includes('INSERT INTO USERS (NAME, EMAIL, PHONE, PASSWORD_HASH, ROLE)')) {
+    if (contains(['INSERT INTO USERS', 'INSERT INTO USERS (NAME, EMAIL, PHONE, PASSWORD_HASH, ROLE)'])) {
       const newUser = {
         id: uuidv4(),
-        name: params[0],
-        email: params[1],
-        phone: params[2],
-        password_hash: params[3],
-        role: params[4],
+        name: p[0],
+        email: p[1],
+        phone: p[2],
+        password_hash: p[3],
+        role: p[4] || 'customer',
         is_active: true,
         created_at: new Date()
       };
@@ -49,91 +78,53 @@ class MockPool {
       return { rows: [newUser] };
     }
 
-    // 3. INSERT TECHNICIAN
-    if (q.includes('INSERT INTO TECHNICIANS (USER_ID) VALUES ($1)')) {
-      const newTech = {
-        id: uuidv4(),
-        user_id: params[0],
-        is_verified: false,
-        is_available: true,
-        subscription_expires_at: null,
-        avg_rating: 0,
-        total_reviews: 0,
-        total_jobs: 0,
-        created_at: new Date()
-      };
-      this.data.technicians.push(newTech);
-      return { rows: [newTech] };
-    }
-
-    // 4. SELECT SERVICES
-    if (q.includes('SELECT * FROM SERVICES')) {
+    // 3. SELECT SERVICES
+    if (contains(['SELECT * FROM SERVICES', 'SELECT DISTINCT CATEGORY FROM SERVICES'])) {
+      if (q.includes('DISTINCT CATEGORY')) {
+        const categories = [...new Set(this.data.services.map(s => s.category))];
+        return { rows: categories.map(c => ({ category: c })) };
+      }
       return { rows: this.data.services };
     }
 
-    // 5. LOGIN
-    if (q.includes('SELECT ID, NAME, EMAIL, PHONE, PASSWORD_HASH, ROLE, AVATAR_URL, IS_ACTIVE FROM USERS WHERE EMAIL = $1')) {
-      const email = params[0];
-      const user = this.data.users.find(u => u.email === email);
+    // 4. LOGIN / GET ME
+    if (contains(['FROM USERS WHERE EMAIL = $1', 'FROM USERS WHERE EMAIL = ?', 'FROM USERS WHERE ID = $1', 'FROM USERS WHERE ID = ?'])) {
+      const val = p[0];
+      const user = this.data.users.find(u => u.email === val || u.id === val);
       return { rows: user ? [user] : [] };
     }
 
-    // 6. INSERT SERVICE REQUEST
-    if (q.includes('INSERT INTO SERVICE_REQUESTS')) {
-      const newRequest = {
-        id: uuidv4(),
-        customer_id: params[0],
-        technician_id: params[1],
-        service_id: params[2],
-        title: params[3],
-        description: params[4],
-        location: params[5],
-        status: 'pending',
-        created_at: new Date()
-      };
-      this.data.service_requests.push(newRequest);
-      return { rows: [newRequest] };
-    }
-
-    // 7. SELECT SERVICE REQUESTS (Dashboard)
-    if (q.includes('SELECT SR.*, U.NAME AS TECHNICIAN_NAME, S.NAME AS SERVICE_NAME')) {
-      const customerId = params[0];
-      const requests = this.data.service_requests
-        .filter(r => r.customer_id === customerId)
-        .map(r => {
-          const service = this.data.services.find(s => s.id === r.service_id);
-          return { ...r, service_name: service?.name, service_icon: service?.icon };
-        });
-      return { rows: requests };
-    }
-
-    // 8. GET TECHNICIAN BY USER_ID
-    if (q.includes('SELECT * FROM TECHNICIANS WHERE USER_ID = $1')) {
-      const userId = params[0];
-      const tech = this.data.technicians.find(t => t.user_id === userId);
-      return { rows: tech ? [tech] : [] };
-    }
-
-    // 9. UPDATE TECHNICIAN SUBSCRIPTION
-    if (q.includes('UPDATE TECHNICIANS SET SUBSCRIPTION_EXPIRES_AT')) {
-      const expiresAt = params[0];
-      const userId = params[1];
-      const tech = this.data.technicians.find(t => t.user_id === userId);
-      if (tech) {
-        tech.subscription_expires_at = expiresAt;
-        return { rows: [tech] };
-      }
-      return { rows: [] };
-    }
-
-    // 10. GET ALL TECHNICIANS (Search)
-    if (q.includes('SELECT T.*, U.NAME, U.EMAIL, U.PHONE, U.AVATAR_URL')) {
-      // Basic mock for technician search
+    // 5. GET ALL TECHNICIANS (Search)
+    if (contains(['SELECT T.*, U.NAME, U.EMAIL, U.PHONE, U.AVATAR_URL', 'FROM TECHNICIANS T JOIN USERS U'])) {
       const techs = this.data.technicians.map(t => {
         const user = this.data.users.find(u => u.id === t.user_id);
-        return { ...t, ...user };
+        
+        // Find associated services for this tech
+        const techServices = this.data.technician_services
+          .filter(ts => ts.technician_id === t.id)
+          .map(ts => {
+            const s = this.data.services.find(serv => serv.id === ts.service_id);
+            return { ...ts, ...s };
+          });
+
+        return { ...t, ...user, services: JSON.stringify(techServices) };
       }).filter(t => t.subscription_expires_at && new Date(t.subscription_expires_at) > new Date());
+      
       return { rows: techs };
+    }
+
+    // 6. GET SINGLE TECHNICIAN
+    if (contains(['SELECT T.*, U.NAME, U.EMAIL, U.PHONE, U.AVATAR_URL', 'WHERE T.ID = ?', 'WHERE T.ID = $1'])) {
+      const techId = p[0];
+      const t = this.data.technicians.find(tech => tech.id === techId);
+      if (!t) return { rows: [] };
+      const user = this.data.users.find(u => u.id === t.user_id);
+      return { rows: [{ ...t, ...user }] };
+    }
+
+    // 7. GET REVIEWS
+    if (contains(['SELECT R.*, U.NAME AS REVIEWER_NAME', 'FROM REVIEWS R'])) {
+      return { rows: [] };
     }
 
     // Default: Empty results

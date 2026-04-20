@@ -1,6 +1,8 @@
-const pool = require('./config/db');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+const pool = require('./config/db');
+const mysql = require('mysql2/promise');
 
 async function seed() {
   try {
