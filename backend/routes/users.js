@@ -28,10 +28,10 @@ router.get('/', authenticate, authorize('admin'), async (req, res) => {
     const result = await pool.query(query, params);
     
     const countResult = await pool.query('SELECT COUNT(*) as count FROM users');
-    const totalCount = countResult[0][0].count;
+    const totalCount = countResult.rows[0].count;
     
     res.json({
-      users: result[0],
+      users: result.rows,
       total: parseInt(totalCount),
       page: parseInt(page),
       pages: Math.ceil(totalCount / limit),
@@ -59,25 +59,64 @@ router.put('/:id', authenticate, async (req, res) => {
     );
 
     const result = await pool.query('SELECT id, name, email, phone, role, avatar_url FROM users WHERE id = ?', [req.params.id]);
-    if (result[0].length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json(result[0][0]);
+    res.json(result.rows[0]);
   } catch (err) {
     console.error('Update user error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Deactivate user (admin)
+// Update user role (Admin only)
+router.put('/:id/role', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    const { role } = req.body;
+    if (!['customer', 'technician', 'admin'].includes(role)) {
+      return res.status(400).json({ error: 'Invalid role' });
+    }
+
+    await pool.query('UPDATE users SET role = ?, updated_at = NOW() WHERE id = ?', [role, req.params.id]);
+    
+    // If promoting to technician, ensure a profile exists
+    if (role === 'technician') {
+      const techRes = await pool.query('SELECT id FROM technicians WHERE user_id = ?', [req.params.id]);
+      if (techRes.rows.length === 0) {
+        // Use Node.js to generate UUID to keep consistency with users table
+        const techId = require('crypto').randomUUID();
+        await pool.query('INSERT INTO technicians (id, user_id) VALUES (?, ?)', [techId, req.params.id]);
+      }
+    }
+
+    res.json({ message: 'User role updated' });
+  } catch (err) {
+    console.error('Update role error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Toggle account status (Admin only)
+router.put('/:id/status', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    const { is_active } = req.body;
+    await pool.query('UPDATE users SET is_active = ?, updated_at = NOW() WHERE id = ?', [is_active, req.params.id]);
+    res.json({ message: `Account ${is_active ? 'activated' : 'deactivated'}` });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Delete user (Admin only)
 router.delete('/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
-    await pool.query(
-      'UPDATE users SET is_active = false, updated_at = NOW() WHERE id = $1',
-      [req.params.id]
-    );
-    res.json({ message: 'User deactivated' });
+    if (req.params.id === req.user.id) {
+      return res.status(400).json({ error: 'Cannot delete your own admin account' });
+    }
+    
+    await pool.query('DELETE FROM users WHERE id = ?', [req.params.id]);
+    res.json({ message: 'User deleted successfully' });
   } catch (err) {
     console.error('Delete user error:', err);
     res.status(500).json({ error: 'Server error' });

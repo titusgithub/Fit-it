@@ -21,7 +21,7 @@ router.post('/register', async (req, res) => {
       'SELECT id FROM users WHERE email = $1 OR phone = $2',
       [email, phone]
     );
-    if (existing[0].length > 0) {
+    if (existing.rows.length > 0) {
       return res.status(409).json({ error: 'Email or phone already registered' });
     }
 
@@ -42,7 +42,7 @@ router.post('/register', async (req, res) => {
       'SELECT id, name, email, phone, role, created_at FROM users WHERE id = ?',
       [userId]
     );
-    const user = userResult[0][0];
+    const user = userResult.rows[0];
 
     // If technician role, create empty technician profile
     if (userRole === 'technician') {
@@ -80,11 +80,11 @@ router.post('/login', async (req, res) => {
       [email]
     );
 
-    if (result[0].length === 0) {
+    if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const user = result[0][0];
+    const user = result.rows[0];
 
     if (!user.is_active) {
       return res.status(403).json({ error: 'Account has been deactivated' });
@@ -117,11 +117,11 @@ router.get('/me', authenticate, async (req, res) => {
       [req.user.id]
     );
 
-    if (result[0].length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const user = result[0][0];
+    const user = result.rows[0];
 
     // If technician, include technician profile
     if (user.role === 'technician') {
@@ -129,7 +129,7 @@ router.get('/me', authenticate, async (req, res) => {
         'SELECT * FROM technicians WHERE user_id = $1',
         [user.id]
       );
-      user.technician = techResult[0][0] || null;
+      user.technician = techResult.rows[0] || null;
     }
 
     res.json(user);
@@ -137,6 +137,16 @@ router.get('/me', authenticate, async (req, res) => {
     console.error('Get me error:', err);
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// Verify role and token payload (Diagnostic)
+router.get('/verify-role', authenticate, (req, res) => {
+  res.json({
+    id: req.user.id,
+    role: req.user.role,
+    email: req.user.email,
+    timestamp: new Date().toISOString()
+  });
 });
 
 module.exports = router;

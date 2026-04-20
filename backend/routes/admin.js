@@ -15,10 +15,10 @@ router.get('/stats', authenticate, authorize('admin'), async (req, res) => {
     ]);
 
     res.json({
-      users: users[0][0],
-      technicians: technicians[0][0],
-      requests: requests[0][0],
-      transactions: transactions[0][0],
+      users: users.rows[0],
+      technicians: technicians.rows[0],
+      requests: requests.rows[0],
+      transactions: transactions.rows[0],
     });
   } catch (err) {
     console.error('Admin stats error:', err);
@@ -34,10 +34,10 @@ router.put('/verify/:id', authenticate, authorize('admin'), async (req, res) => 
       [req.params.id]
     );
     const result = await pool.query('SELECT * FROM technicians WHERE id = ?', [req.params.id]);
-    if (result[0].length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Technician not found' });
     }
-    res.json({ message: 'Technician verified', technician: result[0][0] });
+    res.json({ message: 'Technician verified', technician: result.rows[0] });
   } catch (err) {
     console.error('Verify error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -52,7 +52,7 @@ router.put('/unverify/:id', authenticate, authorize('admin'), async (req, res) =
       [req.params.id]
     );
     const result = await pool.query('SELECT * FROM technicians WHERE id = ?', [req.params.id]);
-    res.json({ message: 'Technician unverified', technician: result[0][0] });
+    res.json({ message: 'Technician unverified', technician: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -85,7 +85,7 @@ router.get('/disputes', authenticate, authorize('admin'), async (req, res) => {
     params.push(parseInt(limit), parseInt(offset));
 
     const result = await pool.query(query, params);
-    res.json({ disputes: result[0], page: parseInt(page) });
+    res.json({ disputes: result.rows, page: parseInt(page) });
   } catch (err) {
     console.error('Get disputes error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -114,7 +114,7 @@ router.post('/disputes', authenticate, async (req, res) => {
       [request_id]
     );
 
-    res.status(201).json(result[0][0]);
+    res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Create dispute error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -131,7 +131,7 @@ router.put('/disputes/:id/resolve', authenticate, authorize('admin'), async (req
       [status || 'resolved', resolution, req.user.id, req.params.id]
     );
     const result = await pool.query('SELECT * FROM disputes WHERE id = ?', [req.params.id]);
-    res.json(result[0][0]);
+    res.json(result.rows[0]);
   } catch (err) {
     console.error('Resolve dispute error:', err);
     res.status(500).json({ error: 'Server error' });

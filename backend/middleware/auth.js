@@ -21,7 +21,15 @@ const authenticate = (req, res, next) => {
 // Role-based access control
 const authorize = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user || !req.user.role) {
+      return res.status(403).json({ error: 'Access denied. No role assigned.' });
+    }
+
+    const userRole = req.user.role.toLowerCase();
+    const authorizedRoles = roles.map(r => r.toLowerCase());
+
+    if (!authorizedRoles.includes(userRole)) {
+      console.warn(`Denied access for user ${req.user.id} with role ${userRole}. Required one of: ${authorizedRoles.join(', ')}`);
       return res.status(403).json({ error: 'Access denied. Insufficient permissions.' });
     }
     next();

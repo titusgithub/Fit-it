@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
 
     query += ' ORDER BY name ASC';
     const result = await pool.query(query, params);
-    res.json(result[0]);
+    res.json(result.rows);
   } catch (err) {
     console.error('Get services error:', err.message);
     res.status(500).json({ 
@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
 router.get('/categories', async (req, res) => {
   try {
     const result = await pool.query('SELECT DISTINCT category FROM services ORDER BY category');
-    res.json(result[0].map(r => r.category));
+    res.json(result.rows.map(r => r.category));
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -57,7 +57,7 @@ router.post('/', authenticate, async (req, res) => {
     );
 
     const result = await pool.query('SELECT * FROM services WHERE id = ?', [serviceId]);
-    res.status(201).json(result[0][0]);
+    res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Create service error:', err);
     res.status(500).json({ error: 'Server error' });

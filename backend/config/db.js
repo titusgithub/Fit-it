@@ -51,10 +51,38 @@ const wrapper = {
     try {
       const result = await pool.query(cleanedText, params);
       // mysql2 returns [rows, fields], mockDb returns { rows: [...] }
-      const rows = Array.isArray(result) ? result[0] : (result.rows || []);
-      return { rows: Array.isArray(rows) ? rows : [rows] };
+      let rows = Array.isArray(result) ? result[0] : (result.rows || []);
+      
+      // Ensure rows is an array
+      if (!Array.isArray(rows)) rows = [rows];
+
+      // Automatic JSON parsing for stringified JSON results from MySQL
+      const parsedRows = rows.map(row => {
+        const newRow = { ...row };
+        for (const key in newRow) {
+          let val = newRow[key];
+          
+          // Handle Buffer data (can happen with JSON types in some MySQL drivers)
+          if (Buffer.isBuffer(val)) {
+            val = val.toString('utf8');
+          }
+
+          if (typeof val === 'string') {
+            const trimmed = val.trim();
+            if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+              try {
+                newRow[key] = JSON.parse(trimmed);
+              } catch (e) {
+                // Keep original string if not valid JSON
+              }
+            }
+          }
+        }
+        return newRow;
+      });
+
+      return { rows: parsedRows };
     } catch (err) {
-      // Re-throw to be caught by route handlers
       throw err;
     }
   },

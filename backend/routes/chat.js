@@ -25,7 +25,7 @@ router.get('/:requestId', authenticate, async (req, res) => {
       [req.params.requestId, req.user.id]
     );
 
-    res.json({ messages: result[0] });
+    res.json({ messages: result.rows });
   } catch (err) {
     console.error('Get messages error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -52,7 +52,7 @@ router.post('/', authenticate, async (req, res) => {
 
     // Get sender info
     const senderResult = await pool.query('SELECT name, avatar_url FROM users WHERE id = ?', [req.user.id]);
-    const message = { ...result[0][0], sender_name: senderResult[0][0].name, sender_avatar: senderResult[0][0].avatar_url };
+    const message = { ...result.rows[0], sender_name: senderResult.rows[0].name, sender_avatar: senderResult.rows[0].avatar_url };
 
     res.status(201).json(message);
   } catch (err) {
@@ -68,7 +68,7 @@ router.get('/unread/count', authenticate, async (req, res) => {
       'SELECT COUNT(*) as count FROM messages WHERE receiver_id = $1 AND is_read = false',
       [req.user.id]
     );
-    res.json({ unread: parseInt(result[0][0].count) });
+    res.json({ unread: parseInt(result.rows[0].count) });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
