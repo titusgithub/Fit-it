@@ -28,10 +28,10 @@ router.get('/', authenticate, authorize('admin'), async (req, res) => {
     const result = await pool.query(query, params);
     
     const countResult = await pool.query('SELECT COUNT(*) as count FROM users');
-    const totalCount = countResult.rows[0].count;
+    const totalCount = countResult[0][0].count;
     
     res.json({
-      users: result.rows,
+      users: result[0],
       total: parseInt(totalCount),
       page: parseInt(page),
       pages: Math.ceil(totalCount / limit),
@@ -59,11 +59,11 @@ router.put('/:id', authenticate, async (req, res) => {
     );
 
     const result = await pool.query('SELECT id, name, email, phone, role, avatar_url FROM users WHERE id = ?', [req.params.id]);
-    if (result.rows.length === 0) {
+    if (result[0].length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json(result[0][0]);
   } catch (err) {
     console.error('Update user error:', err);
     res.status(500).json({ error: 'Server error' });

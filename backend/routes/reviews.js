@@ -18,7 +18,7 @@ router.post('/', authenticate, async (req, res) => {
       `SELECT id FROM service_requests WHERE id = $1 AND customer_id = $2 AND status = 'completed'`,
       [request_id, req.user.id]
     );
-    if (request.rows.length === 0) {
+    if (request[0].length === 0) {
       return res.status(400).json({ error: 'Can only review completed requests' });
     }
 
@@ -27,7 +27,7 @@ router.post('/', authenticate, async (req, res) => {
       'SELECT id FROM reviews WHERE request_id = $1 AND reviewer_id = $2',
       [request_id, req.user.id]
     );
-    if (existing.rows.length > 0) {
+    if (existing[0].length > 0) {
       return res.status(409).json({ error: 'Already reviewed' });
     }
 
@@ -47,10 +47,10 @@ router.post('/', authenticate, async (req, res) => {
     );
     await pool.query(
       'UPDATE technicians SET avg_rating = ?, total_reviews = ? WHERE id = ?',
-      [stats.rows[0].avg_rating || 0, stats.rows[0].total || 0, technician_id]
+      [stats[0][0].avg_rating || 0, stats[0][0].total || 0, technician_id]
     );
 
-    res.status(201).json(result.rows[0]);
+    res.status(201).json(result[0][0]);
   } catch (err) {
     console.error('Create review error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -72,7 +72,7 @@ router.get('/technician/:id', async (req, res) => {
       LIMIT ? OFFSET ?
     `, [req.params.id, parseInt(limit), parseInt(offset)]);
 
-    res.json({ reviews: result.rows, page: parseInt(page) });
+    res.json({ reviews: result[0], page: parseInt(page) });
   } catch (err) {
     console.error('Get reviews error:', err);
     res.status(500).json({ error: 'Server error' });

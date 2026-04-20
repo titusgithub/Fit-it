@@ -19,7 +19,7 @@ router.post('/stk-push', authenticate, async (req, res) => {
       'SELECT * FROM service_requests WHERE id = $1 AND customer_id = $2',
       [request_id, req.user.id]
     );
-    if (serviceReq.rows.length === 0) {
+    if (serviceReq[0].length === 0) {
       return res.status(404).json({ error: 'Service request not found' });
     }
 
@@ -36,7 +36,7 @@ router.post('/stk-push', authenticate, async (req, res) => {
       phone: formattedPhone,
       amount: Math.ceil(amount),
       accountReference: `FF-${request_id.slice(0, 8)}`,
-      description: `FindFix Payment for ${serviceReq.rows[0].title}`,
+      description: `FindFix Payment for ${serviceReq[0][0].title}`,
     });
 
     // Create transaction record
@@ -46,7 +46,7 @@ router.post('/stk-push', authenticate, async (req, res) => {
       [
         request_id,
         req.user.id,
-        serviceReq.rows[0].technician_id,
+        serviceReq[0][0].technician_id,
         amount,
         formattedPhone,
         mpesaResponse.CheckoutRequestID,
@@ -143,8 +143,8 @@ router.post('/callback', async (req, res) => {
         [CheckoutRequestID]
       );
 
-      if (tx.rows.length > 0) {
-        const transaction = tx.rows[0];
+      if (tx[0].length > 0) {
+        const transaction = tx[0][0];
 
         if (transaction.transaction_type === 'subscription') {
           // Extension for 30 days
@@ -208,7 +208,7 @@ router.get('/', authenticate, async (req, res) => {
     }
 
     const result = await pool.query(query, params);
-    res.json({ transactions: result.rows, page: parseInt(page) });
+    res.json({ transactions: result[0], page: parseInt(page) });
   } catch (err) {
     console.error('Get transactions error:', err);
     res.status(500).json({ error: 'Server error' });

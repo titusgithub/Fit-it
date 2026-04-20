@@ -21,7 +21,7 @@ router.post('/', authenticate, async (req, res) => {
     );
 
     const result = await pool.query('SELECT * FROM service_requests WHERE id = ?', [requestId]);
-    res.status(201).json(result.rows[0]);
+    res.status(201).json(result[0][0]);
   } catch (err) {
     console.error('Create request error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -49,7 +49,7 @@ router.get('/', authenticate, async (req, res) => {
       params.push(req.user.id);
     } else if (req.user.role === 'technician') {
       const tech = await pool.query('SELECT id FROM technicians WHERE user_id = $1', [req.user.id]);
-      if (tech.rows.length === 0) return res.json({ requests: [] });
+      if (tech[0].length === 0) return res.json({ requests: [] });
       
       query = `
         SELECT sr.*, u.name as customer_name, s.name as service_name, s.icon as service_icon
@@ -58,7 +58,7 @@ router.get('/', authenticate, async (req, res) => {
         LEFT JOIN services s ON sr.service_id = s.id
         WHERE sr.technician_id = $${paramIdx++}
       `;
-      params.push(tech.rows[0].id);
+      params.push(tech[0][0].id);
     } else {
       query = `
         SELECT sr.*, cu.name as customer_name, tu.name as technician_name, s.name as service_name
@@ -80,7 +80,7 @@ router.get('/', authenticate, async (req, res) => {
     params.push(parseInt(limit), parseInt(offset));
 
     const result = await pool.query(query, params);
-    res.json({ requests: result.rows, page: parseInt(page) });
+    res.json({ requests: result[0], page: parseInt(page) });
   } catch (err) {
     console.error('Get requests error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -102,10 +102,10 @@ router.get('/:id', authenticate, async (req, res) => {
       WHERE sr.id = $1
     `, [req.params.id]);
 
-    if (result.rows.length === 0) {
+    if (result[0].length === 0) {
       return res.status(404).json({ error: 'Request not found' });
     }
-    res.json(result.rows[0]);
+    res.json(result[0][0]);
   } catch (err) {
     console.error('Get request error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -117,11 +117,11 @@ router.put('/:id/accept', authenticate, authorize('technician'), async (req, res
   try {
     const tech = await pool.query('SELECT id, subscription_expires_at FROM technicians WHERE user_id = $1', [req.user.id]);
     
-    if (tech.rows.length === 0) {
+    if (tech[0].length === 0) {
       return res.status(404).json({ error: 'Technician profile not found' });
     }
 
-    const { subscription_expires_at } = tech.rows[0];
+    const { subscription_expires_at } = tech[0][0];
     if (!subscription_expires_at || new Date(subscription_expires_at) < new Date()) {
       return res.status(403).json({ error: 'Active subscription required to accept jobs. Please renew your subscription.' });
     }
@@ -129,14 +129,14 @@ router.put('/:id/accept', authenticate, authorize('technician'), async (req, res
     await pool.query(
       `UPDATE service_requests SET status = 'accepted', technician_id = ?, updated_at = NOW()
        WHERE id = ? AND status = 'pending'`,
-      [tech.rows[0].id, req.params.id]
+      [tech[0][0].id, req.params.id]
     );
 
     const result = await pool.query('SELECT * FROM service_requests WHERE id = ?', [req.params.id]);
-    if (result.rows.length === 0 || result.rows[0].status !== 'accepted') {
+    if (result[0].length === 0 || result[0][0].status !== 'accepted') {
       return res.status(400).json({ error: 'Request not available' });
     }
-    res.json(result.rows[0]);
+    res.json(result[0][0]);
   } catch (err) {
     console.error('Accept request error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -153,19 +153,19 @@ router.put('/:id/complete', authenticate, async (req, res) => {
     );
 
     const result = await pool.query('SELECT * FROM service_requests WHERE id = ?', [req.params.id]);
-    if (result.rows.length === 0 || result.rows[0].status !== 'completed') {
+    if (result[0].length === 0 || result[0][0].status !== 'completed') {
       return res.status(400).json({ error: 'Request cannot be completed' });
     }
 
     // Update technician job count
-    if (result.rows[0].technician_id) {
+    if (result[0][0].technician_id) {
       await pool.query(
         'UPDATE technicians SET total_jobs = total_jobs + 1 WHERE id = $1',
-        [result.rows[0].technician_id]
+        [result[0][0].technician_id]
       );
     }
 
-    res.json(result.rows[0]);
+    res.json(result[0][0]);
   } catch (err) {
     console.error('Complete request error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -181,10 +181,10 @@ router.put('/:id/cancel', authenticate, async (req, res) => {
       [req.params.id]
     );
     const result = await pool.query('SELECT * FROM service_requests WHERE id = ?', [req.params.id]);
-    if (result.rows.length === 0 || result.rows[0].status !== 'cancelled') {
+    if (result[0].length === 0 || result[0][0].status !== 'cancelled') {
       return res.status(400).json({ error: 'Request cannot be cancelled' });
     }
-    res.json(result.rows[0]);
+    res.json(result[0][0]);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }

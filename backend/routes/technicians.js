@@ -50,7 +50,7 @@ router.get('/', async (req, res) => {
     params.push(parseInt(limit), parseInt(offset));
 
     const result = await pool.query(query, params);
-    res.json({ technicians: result.rows, page: parseInt(page) });
+    res.json({ technicians: result[0], page: parseInt(page) });
   } catch (err) {
     console.error('Get technicians error:', err.message);
     res.status(500).json({ 
@@ -75,7 +75,7 @@ router.get('/:id', async (req, res) => {
       WHERE t.id = ?
     `, [req.params.id]);
 
-    if (result.rows.length === 0) {
+    if (result[0].length === 0) {
       return res.status(404).json({ error: 'Technician not found' });
     }
 
@@ -88,7 +88,7 @@ router.get('/:id', async (req, res) => {
       ORDER BY r.created_at DESC LIMIT 10
     `, [req.params.id]);
 
-    res.json({ ...result.rows[0], reviews: reviews.rows });
+    res.json({ ...result[0][0], reviews: reviews[0] });
   } catch (err) {
     console.error('Get technician error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -109,7 +109,7 @@ router.post('/profile', authenticate, authorize('technician'), async (req, res) 
     `, [bio, location, latitude, longitude, years_experience, id_number, id_document_url, req.user.id]);
 
     const updated = await pool.query('SELECT * FROM technicians WHERE user_id = ?', [req.user.id]);
-    res.json(updated.rows[0]);
+    res.json(updated[0][0]);
   } catch (err) {
     console.error('Update profile error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -122,17 +122,17 @@ router.post('/services', authenticate, authorize('technician'), async (req, res)
     const { service_id, price_from, price_to } = req.body;
 
     const tech = await pool.query('SELECT id FROM technicians WHERE user_id = ?', [req.user.id]);
-    if (tech.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
+    if (tech[0].length === 0) return res.status(404).json({ error: 'Profile not found' });
 
     const result = await pool.query(
       `INSERT INTO technician_services (id, technician_id, service_id, price_from, price_to)
        VALUES (UUID(), ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE price_from = VALUES(price_from), price_to = VALUES(price_to)`,
-      [tech.rows[0].id, service_id, price_from, price_to]
+      [tech[0][0].id, service_id, price_from, price_to]
     );
 
-    const inserted = await pool.query('SELECT * FROM technician_services WHERE technician_id = ? AND service_id = ?', [tech.rows[0].id, service_id]);
-    res.status(201).json(inserted.rows[0]);
+    const inserted = await pool.query('SELECT * FROM technician_services WHERE technician_id = ? AND service_id = ?', [tech[0][0].id, service_id]);
+    res.status(201).json(inserted[0][0]);
   } catch (err) {
     console.error('Add service error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -145,7 +145,7 @@ router.delete('/services/:serviceId', authenticate, authorize('technician'), asy
     const tech = await pool.query('SELECT id FROM technicians WHERE user_id = ?', [req.user.id]);
     await pool.query(
       'DELETE FROM technician_services WHERE technician_id = ? AND service_id = ?',
-      [tech.rows[0].id, req.params.serviceId]
+      [tech[0][0].id, req.params.serviceId]
     );
     res.json({ message: 'Service removed' });
   } catch (err) {
@@ -161,9 +161,9 @@ router.get('/me/subscription', authenticate, authorize('technician'), async (req
       'SELECT subscription_expires_at FROM technicians WHERE user_id = ?',
       [req.user.id]
     );
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
+    if (result[0].length === 0) return res.status(404).json({ error: 'Profile not found' });
     
-    const expiresAt = result.rows[0].subscription_expires_at;
+    const expiresAt = result[0][0].subscription_expires_at;
     const isActive = expiresAt ? new Date(expiresAt) > new Date() : false;
     
     res.json({
